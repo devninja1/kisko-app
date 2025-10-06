@@ -1,0 +1,84 @@
+mat-card-title {
+  text-align: center;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.sale-details {
+  margin-top: 20px;
+  padding: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  .label {
+    font-size: 0.8em;
+    color: rgba(0, 0, 0, 0.6);
+  }
+  .value {
+    font-size: 1.2em;
+    font-weight: 500;
+  }
+  &.total .value {
+    color: var(--mat-primary-500, #00bcd4); // Use theme color
+  }
+}
+
+.quantity-input {
+  max-width: 100px;
+}
+
+.rate-input {
+  max-width: 120px;
+}
+
+.add-button {
+  margin-left: auto;
+}
+
+.product-name {
+  margin-right: 8px;
+}
+
+.stock-info {
+  font-size: 0.8em;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.fill-remaining-space {
+  flex: 1 1 auto;
+}
+
+.added-product {
+  color: green;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+
+  .added-icon {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+    margin-left: 8px;
+    color: green;
+  }
+}
+
+// Responsive adjustments for smaller screens
+@media (max-width: 600px) {
+  .sale-details {
+    .add-button {
+      width: 100%;
+      margin-top: 16px;
+    }
+  }
+}

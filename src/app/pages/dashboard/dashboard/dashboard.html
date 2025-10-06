@@ -1,0 +1,25 @@
+<mat-toolbar color="primary" class="mat-elevation-z4">
+  Kisko App
+</mat-toolbar>
+
+<div class="container">
+  <mat-card>
+    <mat-card-title>Welcome to Kisko</mat-card-title>
+    <mat-card-content>
+      Responsive Angular UI with a mobile-first design.
+    </mat-card-content>
+  </mat-card>
+
+  <button mat-raised-button color="accent">Get Started</button>
+
+  <app-sales-entry
+    [products]="products"
+    [addedProductNames]="addedProductNames"
+    (itemAdded)="onItemAdded($event)">
+  </app-sales-entry>
+
+  <app-sales-list
+    [salesList]="salesList"
+    (itemDeleted)="onItemDeleted($event)">
+  </app-sales-list>
+</div>

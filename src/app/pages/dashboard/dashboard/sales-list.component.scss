@@ -1,0 +1,46 @@
+mat-card-title {
+  text-align: center;
+}
+
+.sales-list-header,
+.sales-list-item {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr 1fr auto;
+  gap: 16px;
+  padding: 12px 8px;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.sales-list-header {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.6);
+  border-bottom-width: 2px;
+  border-bottom-color: rgba(0, 0, 0, 0.12);
+}
+
+.sales-list-item.added-item {
+  border-radius: 4px;
+  margin-bottom: 4px;
+  background-color: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  color: #2e7d32;
+  font-weight: 500;
+}
+
+.col-rate,
+.col-qty,
+.col-total,
+.col-actions {
+  text-align: right;
+}
+
+.sales-list-footer {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 1.25em;
+  font-weight: bold;
+  padding: 16px 8px 0;
+  margin-top: 8px;
+  border-top: 2px solid var(--mat-primary-500, #00bcd4);
+}
