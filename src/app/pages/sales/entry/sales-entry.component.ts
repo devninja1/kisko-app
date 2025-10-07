@@ -12,7 +12,8 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 
-import { Product, SalesItem } from '../dashboard.model';
+import { Product } from '../../../model/product.model';
+import { SalesItem } from '../../../model/sales.model';
 
 @Component({
   selector: 'app-sales-entry',

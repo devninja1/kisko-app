@@ -1,8 +1,4 @@
-export interface Product {
-  name: string;
-  rate: number;
-  stock: number;
-}
+import { Product } from "./product.model";
 
 export interface SalesItem {
   product: Product;

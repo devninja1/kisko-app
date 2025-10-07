@@ -1,0 +1,12 @@
+<div class="container">
+  <app-sales-entry
+    [products]="products"
+    [addedProductNames]="addedProductNames"
+    (itemAdded)="onItemAdded($event)">
+  </app-sales-entry>
+
+  <app-sales-list
+    [salesList]="salesList"
+    (itemDeleted)="onItemDeleted($event)">
+  </app-sales-list>
+</div>

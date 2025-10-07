@@ -1,0 +1,20 @@
+<div class="menu-container">
+  <mat-nav-list class="navigation-links">
+    <a
+      mat-list-item
+      *ngFor="let item of menuItems"
+      [routerLink]="item.route"
+      routerLinkActive="active-link"
+      [matTooltip]="item.name"
+      [matTooltipDisabled]="!collapsed"
+      (click)="onItemClick()">
+      <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+      <span matListItemTitle *ngIf="!collapsed">{{ item.name }}</span>
+    </a>
+  </mat-nav-list>
+
+  <a mat-list-item (click)="logout()" class="logout-button" matTooltip="Logout" [matTooltipDisabled]="!collapsed">
+    <mat-icon matListItemIcon>exit_to_app</mat-icon>
+    <span matListItemTitle *ngIf="!collapsed">Logout</span>
+  </a>
+</div>

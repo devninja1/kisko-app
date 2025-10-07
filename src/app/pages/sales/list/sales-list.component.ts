@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 
-import { SalesItem } from '../dashboard.model';
+import { SalesItem } from '../../../model/sales.model';
 
 @Component({
   selector: 'app-sales-list',

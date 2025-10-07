@@ -1,0 +1,33 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.navigation-links {
+  flex-grow: 1;
+  padding-top: 0;
+}
+
+.logout-button {
+  flex-shrink: 0;
+}
+
+a[mat-list-item] {
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+  }
+
+  &.active-link {
+    background-color: rgba(63, 81, 181, 0.1); // A semi-transparent version of the primary color
+    color: #3f51b5; // Material Design default primary color
+
+    mat-icon {
+      color: #3f51b5;
+    }
+  }
+}
+
+mat-sidenav.collapsed {
+  width: 64px;
+}
