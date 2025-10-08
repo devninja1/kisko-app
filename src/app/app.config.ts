@@ -1,6 +1,5 @@
 import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { DBConfig, NgxIndexedDBModule } from 'ngx-indexed-db';
 
@@ -31,13 +30,6 @@ const dbConfig: DBConfig = {
       { name: 'grandTotal', keypath: 'grandTotal', options: { unique: false } }
     ]
   }, {
-    store: 'sales',
-    storeConfig: { keyPath: 'id', autoIncrement: true },
-    storeSchema: [
-      { name: 'date', keypath: 'date', options: { unique: false } },
-      { name: 'grandTotal', keypath: 'grandTotal', options: { unique: false } }
-    ]
-  }, {
     store: 'failed-sync-queue',
     storeConfig: { keyPath: 'id', autoIncrement: true },
     storeSchema: []
@@ -49,5 +41,5 @@ const dbConfig: DBConfig = {
 };
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideRouter(routes), provideAnimationsAsync(), provideHttpClient(withInterceptors([httpErrorInterceptor, loadingInterceptor])), importProvidersFrom(NgxIndexedDBModule.forRoot(dbConfig))]
+  providers: [provideRouter(routes), provideHttpClient(withInterceptors([httpErrorInterceptor, loadingInterceptor])), importProvidersFrom(NgxIndexedDBModule.forRoot(dbConfig))]
 };

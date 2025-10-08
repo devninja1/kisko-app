@@ -11,7 +11,7 @@ export const routes: Routes = [
   { path: 'sales', component: SalesComponent },
   { path: 'products', component: ProductComponent },
   { path: 'customers', component: CustomerComponent },
-  { path: 'saleshistory', component: SalesHistoryComponent },
+  { path: 'sales-history', component: SalesHistoryComponent },
   { path: 'sync-status', component: SyncStatusComponent },
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: '**', redirectTo: '/dashboard' } // Wildcard route for a 404 page
