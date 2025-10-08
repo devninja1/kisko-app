@@ -8,15 +8,6 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
-  "ng": {
-    "build": {
-      "options": {
-        "externalDependencies": [
-          "@angular/animations/browser"
-        ]
-      }
-    }
-  },
   "prettier": {
     "printWidth": 100,
     "singleQuote": true,
