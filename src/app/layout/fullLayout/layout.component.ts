@@ -6,16 +6,17 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule, MatSnackBarRef } from '@angular/material/snack-bar';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MenuComponent } from '../menu/menu.component';
 import { RouterOutlet } from '@angular/router';
 import { LoadingService } from '../../core/services/loading.service';
 import { SyncService } from '../../core/services/sync.service';
-import { Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, combineLatest, map, startWith, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, MatToolbarModule, MatIconModule, MatSidenavModule, MatButtonModule, MatProgressSpinnerModule, MenuComponent, RouterOutlet, MatSnackBarModule],
+  imports: [CommonModule, MatToolbarModule, MatIconModule, MatSidenavModule, MatButtonModule, MatProgressSpinnerModule, MenuComponent, RouterOutlet, MatSnackBarModule, MatBadgeModule],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
 })
@@ -27,10 +28,15 @@ export class LayoutComponent implements OnInit, OnDestroy {
   private snackBar = inject(MatSnackBar);
   private destroy$ = new Subject<void>();
   private offlineSnackBarRef: MatSnackBarRef<any> | null = null;
+  showSyncButton$!: Observable<boolean>;
+  pendingRequestCount$!: Observable<number>;
 
   ngOnInit(): void {
-    this.syncService.isOnline()
-      .pipe(takeUntil(this.destroy$))
+    const isOnline$ = this.syncService.isOnline();
+    const pendingRequests$ = this.syncService.getPendingRequestCount().pipe(startWith(0));
+    this.pendingRequestCount$ = pendingRequests$;
+
+    isOnline$.pipe(takeUntil(this.destroy$))
       .subscribe(isOnline => {
         if (!isOnline) {
           this.offlineSnackBarRef = this.snackBar.open('You are currently offline.', 'Dismiss', {
@@ -40,6 +46,10 @@ export class LayoutComponent implements OnInit, OnDestroy {
           this.offlineSnackBarRef?.dismiss();
         }
       });
+
+    this.showSyncButton$ = combineLatest([isOnline$, pendingRequests$]).pipe(
+      map(([isOnline, count]) => isOnline && count > 0)
+    );
   }
 
   ngOnDestroy(): void {
@@ -53,5 +63,10 @@ export class LayoutComponent implements OnInit, OnDestroy {
 
   collapseMenu(): void {
     this.isCollapsed = true;
+  }
+
+  onSyncNow(): void {
+    this.snackBar.open('Syncing pending changes...', undefined, { duration: 2000 });
+    this.syncService.processQueue();
   }
 }

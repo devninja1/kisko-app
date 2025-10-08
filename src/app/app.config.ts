@@ -31,6 +31,17 @@ const dbConfig: DBConfig = {
       { name: 'grandTotal', keypath: 'grandTotal', options: { unique: false } }
     ]
   }, {
+    store: 'sales',
+    storeConfig: { keyPath: 'id', autoIncrement: true },
+    storeSchema: [
+      { name: 'date', keypath: 'date', options: { unique: false } },
+      { name: 'grandTotal', keypath: 'grandTotal', options: { unique: false } }
+    ]
+  }, {
+    store: 'failed-sync-queue',
+    storeConfig: { keyPath: 'id', autoIncrement: true },
+    storeSchema: []
+  }, {
     store: 'sync-queue',
     storeConfig: { keyPath: 'id', autoIncrement: true },
     storeSchema: []

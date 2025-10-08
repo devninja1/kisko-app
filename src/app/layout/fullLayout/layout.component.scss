@@ -24,6 +24,9 @@ mat-sidenav.collapsed {
   z-index: 1000;
   gap: 8px;
 }
+.header .spacer {
+  flex: 1 1 auto;
+}
 
 .content {
   flex: 1; // Allows the main content to grow and push the footer down

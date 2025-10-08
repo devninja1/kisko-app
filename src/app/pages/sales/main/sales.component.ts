@@ -161,6 +161,7 @@ export class SalesComponent implements OnInit {
     this.salesService
       .saveSale({
         customer: this.selectedCustomer,
+        customerName: this.selectedCustomer.name,
         items: this.salesList,
         grandTotal: this.grandTotal,
         date: new Date(),

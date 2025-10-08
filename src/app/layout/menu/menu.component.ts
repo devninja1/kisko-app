@@ -22,6 +22,7 @@ export class MenuComponent {
     { name: 'Products', icon: 'inventory_2', route: '/products' },
     { name: 'Sales History', icon: 'history', route: '/saleshistory' },
     { name: 'Customers', icon: 'people', route: '/customers' },
+    { name: 'Sync Status', icon: 'sync_problem', route: '/sync-status' },
     { name: 'Settings', icon: 'settings', route: '/settings' },
   ];
 

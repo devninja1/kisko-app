@@ -4,6 +4,17 @@
   </button>
   <mat-icon>storefront</mat-icon>
   <span>Kisko App</span>
+  <span class="spacer"></span>
+  @if (showSyncButton$ | async) {
+    <button mat-icon-button
+            (click)="onSyncNow()"
+            matTooltip="Sync pending changes"
+            [matBadge]="pendingRequestCount$ | async"
+            matBadgeColor="warn"
+            [matBadgeHidden]="(pendingRequestCount$ | async) === 0">
+      <mat-icon>sync</mat-icon>
+    </button>
+  }
 </mat-toolbar>
 <mat-sidenav-container class="app-container">
   <mat-sidenav #sidenav mode="side" opened class="mat-elevation-z4" [class.collapsed]="isCollapsed">

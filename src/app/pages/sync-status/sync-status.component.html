@@ -1,0 +1,72 @@
+<div class="page-container">
+  <div class="header">
+    <h1>Synchronization Status</h1>
+  </div>
+
+  <h2>Pending Requests ({{ (pendingRequests$ | async)?.length || 0 }})</h2>
+  @if (pendingRequests$ | async; as pendingRequests) {
+  @if (pendingRequests.length === 0) {
+  <p>No pending requests to sync.</p>
+  } @else {
+  <div class="mat-elevation-z8">
+    <table mat-table [dataSource]="pendingRequests">
+      <ng-container matColumnDef="method">
+        <th mat-header-cell *matHeaderCellDef> Method </th>
+        <td mat-cell *matCellDef="let req"> {{req.method}} </td>
+      </ng-container>
+      <ng-container matColumnDef="url">
+        <th mat-header-cell *matHeaderCellDef> URL </th>
+        <td mat-cell *matCellDef="let req"> {{req.url}} </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="['method', 'url']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['method', 'url'];"></tr>
+    </table>
+  </div>
+  }
+  }
+
+  <div class="failed-header">
+    <h2>Failed Requests ({{ (failedRequests$ | async)?.length || 0 }})</h2>
+    @if ((failedRequests$ | async)?.length ?? 0 > 0) {
+    <button mat-flat-button color="primary" (click)="retryAllFailedRequests()"><mat-icon>replay_circle_filled</mat-icon>
+      Retry All</button>
+    }
+  </div>
+
+  @if (failedRequests$ | async; as failedRequests) {
+  @if (failedRequests.length === 0) {
+  <p>No failed requests.</p>
+  } @else {
+  <div class="mat-elevation-z8">
+    <table mat-table [dataSource]="failedRequests">
+      <ng-container matColumnDef="method">
+        <th mat-header-cell *matHeaderCellDef> Method </th>
+        <td mat-cell *matCellDef="let req"> {{req.method}} </td>
+      </ng-container>
+      <ng-container matColumnDef="url">
+        <th mat-header-cell *matHeaderCellDef> URL </th>
+        <td mat-cell *matCellDef="let req"> {{req.url}} </td>
+      </ng-container>
+      <ng-container matColumnDef="error">
+        <th mat-header-cell *matHeaderCellDef> Error </th>
+        <td mat-cell *matCellDef="let req"> {{req.error}} </td>
+      </ng-container>
+      <ng-container matColumnDef="timestamp">
+        <th mat-header-cell *matHeaderCellDef> Failed On </th>
+        <td mat-cell *matCellDef="let req"> {{req.timestamp | date:'short'}} </td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let req">
+          <button mat-icon-button color="primary" (click)="retryRequest(req)"
+            matTooltip="Retry"><mat-icon>replay</mat-icon></button>
+          <button mat-icon-button color="warn" (click)="deleteFailedRequest(req.id ?? 0)" matTooltip="Delete"><mat-icon>delete</mat-icon></button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="['method', 'url', 'error', 'timestamp', 'actions']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['method', 'url', 'error', 'timestamp', 'actions'];"></tr>
+    </table>
+  </div>
+  }
+  }
+</div>

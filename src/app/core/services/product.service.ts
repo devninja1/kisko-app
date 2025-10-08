@@ -12,6 +12,13 @@ export class ProductService {
   private apiUrl = 'http://localhost:3000/api/products';
   private isOnline = navigator.onLine;
   private products$ = new BehaviorSubject<Product[]>([]);
+  private defaultProducts: Product[] = [
+    { id: 1, name: 'Laptop Pro', rate: 1200, stock: 10 },
+    { id: 2, name: 'Wireless Mouse', rate: 25, stock: 50 },
+    { id: 3, name: 'Mechanical Keyboard', rate: 95, stock: 25 },
+    { id: 4, name: '4K Monitor', rate: 450, stock: 15 },
+    { id: 5, name: 'Webcam HD', rate: 60, stock: 30 },
+  ];
 
   constructor(
     private http: HttpClient,
@@ -24,17 +31,31 @@ export class ProductService {
   }
 
   private loadInitialData() {
-    if (this.isOnline) {
-      this.http.get<Product[]>(this.apiUrl).subscribe((products: Product[]) => {
-        this.dbService.clear('products').subscribe(() => {
-          this.dbService.bulkAdd<Product>('products', products).subscribe(() => {
-            this.dbService.getAll<Product>('products').subscribe(prods => this.products$.next(prods));
+    this.dbService.count('products').subscribe(count => {
+      if (count === 0) {
+        // DB is empty, populate with default data first.
+        this.dbService.bulkAdd<Product>('products', this.defaultProducts).subscribe(() => {
+          this.products$.next(this.defaultProducts);
+          if (this.isOnline) this.syncWithApi();
+        });
+      } else {
+        // DB has data, load it and then sync if online.
+        this.dbService.getAll<Product>('products').subscribe(prods => {
+          this.products$.next(prods);
+          if (this.isOnline) this.syncWithApi();
           });
+      }
+    });
+  }
+
+  private syncWithApi() {
+    this.http.get<Product[]>(this.apiUrl).subscribe((products: Product[]) => {
+      this.dbService.clear('products').subscribe(() => {
+        this.dbService.bulkAdd<Product>('products', products).subscribe(() => {
+          this.dbService.getAll<Product>('products').subscribe(prods => this.products$.next(prods));
         });
       });
-    } else {
-      this.dbService.getAll<Product>('products').subscribe(prods => this.products$.next(prods));
-    }
+    });
   }
 
   getProducts(): Observable<Product[]> {

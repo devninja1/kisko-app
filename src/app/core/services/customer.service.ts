@@ -12,6 +12,12 @@ export class CustomerService {
   private apiUrl = 'http://localhost:3000/api/customers';
   private isOnline = navigator.onLine;
   private customers$ = new BehaviorSubject<Customer[]>([]);
+  private defaultCustomers: Customer[] = [
+    { id: 1, name: 'John Doe', email: 'john.doe@example.com', phone: '123-456-7890' },
+    { id: 2, name: 'Jane Smith', email: 'jane.smith@example.com', phone: '234-567-8901' },
+    { id: 3, name: 'Peter Jones', email: 'peter.jones@example.com', phone: '345-678-9012' },
+    { id: 4, name: 'Mary Johnson', email: 'mary.j@example.com', phone: '456-789-0123' },
+  ];
 
   constructor(
     private http: HttpClient,
@@ -24,17 +30,31 @@ export class CustomerService {
   }
 
   private loadInitialData() {
-    if (this.isOnline) {
-      this.http.get<Customer[]>(this.apiUrl).subscribe((customers: Customer[]) => {
-        this.dbService.clear('customers').subscribe(() => {
-          this.dbService.bulkAdd<Customer>('customers', customers).subscribe(() => {
-            this.dbService.getAll<Customer>('customers').subscribe(custs => this.customers$.next(custs));
+    this.dbService.count('customers').subscribe(count => {
+      if (count === 0) {
+        // DB is empty, populate with default data first.
+        this.dbService.bulkAdd<Customer>('customers', this.defaultCustomers).subscribe(() => {
+          this.customers$.next(this.defaultCustomers);
+          if (this.isOnline) this.syncWithApi();
+        });
+      } else {
+        // DB has data, load it and then sync if online.
+        this.dbService.getAll<Customer>('customers').subscribe(custs => {
+          this.customers$.next(custs);
+          if (this.isOnline) this.syncWithApi();
           });
+      }
+    });
+  }
+
+  private syncWithApi() {
+    this.http.get<Customer[]>(this.apiUrl).subscribe((customers: Customer[]) => {
+      this.dbService.clear('customers').subscribe(() => {
+        this.dbService.bulkAdd<Customer>('customers', customers).subscribe(() => {
+          this.dbService.getAll<Customer>('customers').subscribe(custs => this.customers$.next(custs));
         });
       });
-    } else {
-      this.dbService.getAll<Customer>('customers').subscribe(custs => this.customers$.next(custs));
-    }
+    });
   }
 
   getCustomers(): Observable<Customer[]> {

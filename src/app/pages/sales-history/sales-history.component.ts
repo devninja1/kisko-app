@@ -75,7 +75,7 @@ export class SalesHistoryComponent implements OnInit {
               <h2>Kisko App</h2>
               <p>Sale Receipt</p>
               <p>Date: ${datePipe.transform(sale.date, 'short')}</p>
-              <p>Customer: ${sale.customer?.name ?? 'N/A'}</p>
+              <p>Customer: ${sale.customerName ?? 'N/A'}</p>
             </div>
             <table class="items-table">
               <thead>
