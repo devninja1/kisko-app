@@ -7,6 +7,12 @@
     </button>
   </div>
 
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Search Customers</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="E.g. John Doe" #input>
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
   <div class="mat-elevation-z8 table-container">
     <table mat-table [dataSource]="dataSource">
 

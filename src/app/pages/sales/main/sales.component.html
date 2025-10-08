@@ -1,4 +1,27 @@
-<div class="container">
+<div class="sales-container">
+  <div class="customer-selection">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Search for a Customer</mat-label>
+      <input
+        type="text"
+        matInput
+        [formControl]="customerSearch"
+        [matAutocomplete]="autoCustomer">
+      <mat-autocomplete #autoCustomer="matAutocomplete" [displayWith]="displayCustomer" (optionSelected)="onCustomerSelected($event)">
+        @for (customer of filteredCustomers$ | async; track customer.id) {
+          <mat-option [value]="customer">
+            {{customer.name}}
+          </mat-option>
+        }
+        @if (((filteredCustomers$ | async)?.length === 0) && customerSearch.value && (typeof customerSearch.value === 'string')) {
+          <mat-option (click)="createNewCustomer(customerSearch.value)">
+            <mat-icon>add</mat-icon>
+            Create new customer: "{{customerSearch.value}}"
+          </mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+  </div>
   <app-sales-entry
     [products]="(products$ | async) ?? []"
     [addedProductNames]="addedProductNames"
@@ -9,4 +32,12 @@
     [salesList]="salesList"
     (itemDeleted)="onItemDeleted($event)">
   </app-sales-list>
+
+  @if (salesList.length > 0) {
+    <div class="save-sale-container">
+      <button mat-raised-button color="primary" class="save-button" (click)="saveSale()">
+        Save Sale
+      </button>
+    </div>
+  }
 </div>

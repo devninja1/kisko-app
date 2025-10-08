@@ -1,0 +1,71 @@
+<div class="page-container">
+  <div class="header">
+    <h1>Sales History</h1>
+  </div>
+
+  <div class="mat-elevation-z8">
+    <table mat-table [dataSource]="dataSource" multiTemplateDataRows class="mat-elevation-z8">
+      <!-- Expand Column -->
+      <ng-container matColumnDef="expand">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let sale">
+          <button mat-icon-button (click)="(expandedElement = expandedElement === sale ? null : sale); $event.stopPropagation()">
+            <mat-icon>{{expandedElement === sale ? 'expand_less' : 'expand_more'}}</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> Sale ID </th>
+        <td mat-cell *matCellDef="let sale"> #{{sale.id}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="customer">
+        <th mat-header-cell *matHeaderCellDef> Customer </th>
+        <td mat-cell *matCellDef="let sale"> {{sale.customer?.name}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef> Date </th>
+        <td mat-cell *matCellDef="let sale"> {{sale.date | date:'short'}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="grandTotal">
+        <th mat-header-cell *matHeaderCellDef> Total </th>
+        <td mat-cell *matCellDef="let sale"> {{sale.grandTotal | currency}} </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let sale">
+          <button mat-icon-button color="primary" matTooltip="Print Receipt" (click)="printReceipt(sale); $event.stopPropagation()">
+            <mat-icon>print</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <!-- Expanded Content Column - The detail row is made up of this one column that spans across all columns -->
+      <ng-container matColumnDef="expandedDetail">
+        <td mat-cell *matCellDef="let sale" [attr.colspan]="columnsToDisplay.length">
+          <div class="sale-detail">
+            <h4>Sale Details</h4>
+            <ul>
+              @for(item of sale.items; track item.product.id) {
+                <li>{{item.product.name}} ({{item.quantity}} x {{item.product.rate | currency}}) = <strong>{{item.total | currency}}</strong></li>
+              }
+            </ul>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+      <tr mat-row *matRowDef="let sale; columns: columnsToDisplay;"
+          class="sale-row"
+          [class.expanded-row]="expandedElement === sale"
+          (click)="expandedElement = expandedElement === sale ? null : sale">
+      </tr>
+      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
+    </table>
+  </div>
+</div>
