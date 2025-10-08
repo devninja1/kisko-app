@@ -1,6 +1,6 @@
 <div class="container">
   <app-sales-entry
-    [products]="products"
+    [products]="(products$ | async) ?? []"
     [addedProductNames]="addedProductNames"
     (itemAdded)="onItemAdded($event)">
   </app-sales-entry>

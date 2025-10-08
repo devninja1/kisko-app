@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>{{ data.product ? 'Edit Product' : 'Create Product' }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="productForm" class="product-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Product Name</mat-label>
+      <input matInput formControlName="name" required>
+      @if (productForm.get('name')?.hasError('required')) {
+        <mat-error>Product name is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Rate</mat-label>
+      <input matInput type="number" formControlName="rate" required min="0">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Stock</mat-label>
+      <input matInput type="number" formControlName="stock" required min="0">
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-flat-button color="primary" [disabled]="!productForm.valid" (click)="onSave()">Save</button>
+</mat-dialog-actions>

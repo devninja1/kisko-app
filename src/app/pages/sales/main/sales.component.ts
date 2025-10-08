@@ -1,12 +1,15 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Observable } from 'rxjs';
 
 // Child Components
 import { SalesEntryComponent } from '../entry/sales-entry.component';
 import { SalesListComponent } from '../list/sales-list.component';
 import { Product } from '../../../model/product.model';
 import { SalesItem } from '../../../model/sales.model';
+import { ProductService } from '../../../core/services/product.service';
 
+// Main Component
 @Component({
   selector: 'app-sales',
   standalone: true,
@@ -14,31 +17,20 @@ import { SalesItem } from '../../../model/sales.model';
   templateUrl: './sales.component.html',
   styleUrl: './sales.component.scss',
 })
-export class SalesComponent {
-  products: Product[] = [
-    { name: 'Laptop Pro', rate: 1200, stock: 10 },
-    { name: 'Wireless Mouse', rate: 25, stock: 50 },
-    { name: 'Mechanical Keyboard', rate: 95, stock: 25 },
-    { name: '4K Monitor', rate: 450, stock: 15 },
-    { name: 'Webcam HD', rate: 60, stock: 30 },
-  ];
-
+export class SalesComponent implements OnInit {
+  products$: Observable<Product[]>;
   salesList: SalesItem[] = [];
   addedProductNames = new Set<string>();
 
+  constructor(private productService: ProductService) {
+    this.products$ = this.productService.getProducts();
+  }
+
+  ngOnInit(): void {}
+
   onItemAdded(newItem: SalesItem) {
-    // Find the product in the master list to update its stock
-    const productInMasterList = this.products.find(p => p.name === newItem.product.name);
-    if (!productInMasterList) {
-      console.error('Product not found in master list:', newItem.product.name);
-      return;
-    }
-
     // Decrease stock from the master product list
-    productInMasterList.stock -= newItem.quantity;
-
-    // Create a new array reference for products to trigger change detection in the child component
-    this.products = [...this.products];
+    this.productService.updateStock(newItem.product.name, -newItem.quantity);
 
     const existingItemIndex = this.salesList.findIndex(
       (saleItem) => saleItem.product.name === newItem.product.name
@@ -65,13 +57,7 @@ export class SalesComponent {
   onItemDeleted(index: number) {
     const deletedItem = this.salesList[index];
     if (deletedItem) {
-      // Find the product in the master list to return its stock
-      const productInMasterList = this.products.find(p => p.name === deletedItem.product.name);
-      if (productInMasterList) {
-        productInMasterList.stock += deletedItem.quantity;
-        // Create a new array reference for products to trigger change detection
-        this.products = [...this.products];
-      }
+      this.productService.updateStock(deletedItem.product.name, deletedItem.quantity);
 
       this.addedProductNames.delete(deletedItem.product.name);
       // Create a new array to ensure change detection is triggered

@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>{{ data.customer ? 'Edit Customer' : 'Create Customer' }}</h2>
+<mat-dialog-content>
+  <form [formGroup]="customerForm" class="customer-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Customer Name</mat-label>
+      <input matInput formControlName="name" required>
+      @if (customerForm.get('name')?.hasError('required')) {
+        <mat-error>Customer name is required</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" formControlName="email" required>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Phone</mat-label>
+      <input matInput formControlName="phone">
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-flat-button color="primary" [disabled]="!customerForm.valid" (click)="onSave()">Save</button>
+</mat-dialog-actions>
