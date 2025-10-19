@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "kisko-app": {
+    "kiosk-app": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -61,10 +61,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "kisko-app:build:production"
+              "buildTarget": "kiosk-app:build:production"
             },
             "development": {
-              "buildTarget": "kisko-app:build:development"
+              "buildTarget": "kiosk-app:build:development"
             }
           },
           "defaultConfiguration": "development"
