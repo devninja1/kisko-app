@@ -3,7 +3,7 @@
     <mat-icon>menu</mat-icon>
   </button>
   <mat-icon>storefront</mat-icon>
-  <span>Kisko App</span>
+  <span>Kiosk App</span>
   <span class="spacer"></span>
   @if (showSyncButton$ | async) {
     <button mat-icon-button
@@ -17,8 +17,8 @@
   }
 </mat-toolbar>
 <mat-sidenav-container class="app-container">
-  <mat-sidenav #sidenav mode="side" opened class="mat-elevation-z4" [class.collapsed]="isCollapsed">
-    <app-menu [collapsed]="isCollapsed" (menuItemClicked)="!isCollapsed && collapseMenu()"></app-menu>
+  <mat-sidenav #sidenav mode="over" class="mat-elevation-z4">
+    <app-menu [collapsed]="false" (menuItemClicked)="collapseMenu()"></app-menu>
   </mat-sidenav>
 
   @if(loadingService.loading$ | async) {

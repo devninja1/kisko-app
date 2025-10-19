@@ -1,8 +1,8 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule, MatSnackBarRef } from '@angular/material/snack-bar';
@@ -21,6 +21,7 @@ import { Observable, Subject, combineLatest, map, startWith, takeUntil } from 'r
   styleUrl: './layout.component.scss'
 })
 export class LayoutComponent implements OnInit, OnDestroy {
+  @ViewChild('sidenav') sidenav!: MatSidenav;
   currentYear = new Date().getFullYear();
   isCollapsed = false;
   loadingService = inject(LoadingService);
@@ -58,11 +59,11 @@ export class LayoutComponent implements OnInit, OnDestroy {
   }
 
   toggleCollapse(): void {
-    this.isCollapsed = !this.isCollapsed;
+    this.sidenav.toggle();
   }
 
   collapseMenu(): void {
-    this.isCollapsed = true;
+    this.sidenav.close();
   }
 
   onSyncNow(): void {
