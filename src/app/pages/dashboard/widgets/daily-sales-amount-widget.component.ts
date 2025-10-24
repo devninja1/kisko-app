@@ -14,7 +14,7 @@ interface ChartData {
 @Component({
   selector: 'app-daily-sales-amount-widget',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule, CurrencyPipe, NgxChartsModule],
+  imports: [CommonModule, MatCardModule, MatIconModule, NgxChartsModule],
   providers: [CurrencyPipe], // Make CurrencyPipe available for injection
   templateUrl: './daily-sales-amount-widget.component.html',
   styleUrl: './daily-sales-amount-widget.component.scss'
