@@ -1,26 +1,30 @@
-<mat-card *ngIf="salesList.length > 0">
-  <mat-card-title>Current Sale</mat-card-title>
-  <mat-card-content>
-    <div class="sales-list-header">
-      <span class="col-product">Product</span>
-      <span class="col-rate">Rate</span>
-      <span class="col-qty">Qty</span>
-      <span class="col-total">Total</span>
-      <span class="col-actions"></span>
-    </div>
-    <div class="sales-list-item added-item" *ngFor="let item of salesList; let i = index; trackBy: trackByProduct">
-      <span class="col-product">{{ item.product.name }}</span>
-      <span class="col-rate">{{ item.product.rate | currency }}</span>
-      <span class="col-qty">{{ item.quantity }}</span>
-      <span class="col-total">{{ item.total | currency }}</span>
-      <span class="col-actions">
-        <button mat-icon-button color="warn" (click)="deleteItem(i)" aria-label="Delete item">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </span>
-    </div>
-    <div class="sales-list-footer">
-      Grand Total: {{ grandTotal | currency }}
-    </div>
-  </mat-card-content>
-</mat-card>
+@if (salesList.length > 0) {
+  <mat-card>
+    <mat-card-title>Current Sale</mat-card-title>
+    <mat-card-content>
+      <div class="sales-list-header">
+        <span class="col-product">Product</span>
+        <span class="col-rate">Rate</span>
+        <span class="col-qty">Qty</span>
+        <span class="col-total">Total</span>
+        <span class="col-actions"></span>
+      </div>
+      @for (item of salesList; track trackByProduct(i, item); let i = $index) {
+        <div class="sales-list-item added-item">
+          <span class="col-product">{{ item.product.name }}</span>
+          <span class="col-rate">{{ item.product.rate | currency:'INR':'symbol' }}</span>
+          <span class="col-qty">{{ item.quantity }}</span>
+          <span class="col-total">{{ item.total | currency:'INR':'symbol' }}</span>
+          <span class="col-actions">
+            <button mat-icon-button color="warn" (click)="deleteItem(i)" aria-label="Delete item">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </span>
+        </div>
+      }
+      <div class="sales-list-footer">
+        Grand Total: {{ grandTotal | currency:'INR':'symbol' }}
+      </div>
+    </mat-card-content>
+  </mat-card>
+}

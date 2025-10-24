@@ -2,10 +2,15 @@ import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { DBConfig, NgxIndexedDBModule } from 'ngx-indexed-db';
-
+import { registerLocaleData } from '@angular/common';
+import localeIn from '@angular/common/locales/en-IN';
+import { LOCALE_ID } from '@angular/core';
 import { routes } from './app.routes';
 import { httpErrorInterceptor } from './core/interceptors/http-error.interceptor';
 import { loadingInterceptor } from './core/interceptors/loading.interceptor';
+
+// Register the locale data for 'en-IN'
+registerLocaleData(localeIn);
 
 const dbConfig: DBConfig = {
   name: 'KiskoAppDb',
@@ -41,5 +46,10 @@ const dbConfig: DBConfig = {
 };
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideRouter(routes), provideHttpClient(withInterceptors([httpErrorInterceptor, loadingInterceptor])), importProvidersFrom(NgxIndexedDBModule.forRoot(dbConfig))]
+  providers: [provideRouter(routes), 
+    provideHttpClient(withInterceptors([httpErrorInterceptor, loadingInterceptor])),
+     importProvidersFrom(NgxIndexedDBModule.forRoot(dbConfig)),
+    // Provide the LOCALE_ID for the entire application
+    {provide: LOCALE_ID, useValue: 'en-IN'},
+  ]
 };

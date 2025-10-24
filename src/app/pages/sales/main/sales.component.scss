@@ -1,6 +1,22 @@
-.container {
+app-sales-list {
+  display: block;
+  margin-top: 20px;
+}
+
+.sales-container {
+  padding: 20px;
+}
+
+.customer-selection {
+  margin-bottom: 20px;
+}
+
+.save-sale-container {
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px;
+  justify-content: flex-end;
+  padding-top: 16px;
+}
+
+.full-width {
+  width: 100%;
 }
