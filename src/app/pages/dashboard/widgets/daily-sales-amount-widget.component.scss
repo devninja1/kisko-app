@@ -1,0 +1,12 @@
+.no-sales-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  color: #888;
+}
+
+.chart-container {
+  height: 350px; // A bit taller for the legend
+  width: 100%;
+}

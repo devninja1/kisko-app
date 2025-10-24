@@ -1,0 +1,17 @@
+<div class="quick-links-container">
+  @for (link of links; track link.path) {
+    <a mat-stroked-button [routerLink]="link.path" class="quick-link-button">
+      <mat-icon>{{ link.icon }}</mat-icon>
+      <span>{{ link.label }}</span>
+      @if (link.path === '/products' && (totalProducts$ | async); as count) {
+        <span class="count-badge">{{ count }}</span>
+      }
+      @if (link.path === '/customers' && (totalCustomers$ | async); as count) {
+        <span class="count-badge">{{ count }}</span>
+      }
+      @if (link.path === '/sales-history' && (totalSalesToday$ | async); as total) {
+        <span class="count-badge amount-badge">{{ total | currency:'INR':'symbol':'1.0-0' }}</span>
+      }
+    </a>
+  }
+</div>

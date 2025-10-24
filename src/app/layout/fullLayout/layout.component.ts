@@ -1,61 +1,51 @@
-import { Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
-import { MatButtonModule } from '@angular/material/button';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatSnackBar, MatSnackBarModule, MatSnackBarRef } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Observable } from 'rxjs';
+
 import { MenuComponent } from '../menu/menu.component';
-import { RouterOutlet } from '@angular/router';
 import { LoadingService } from '../../core/services/loading.service';
 import { SyncService } from '../../core/services/sync.service';
-import { Observable, Subject, combineLatest, map, startWith, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [CommonModule, MatToolbarModule, MatIconModule, MatSidenavModule, MatButtonModule, MatProgressSpinnerModule, MenuComponent, RouterOutlet, MatSnackBarModule, MatBadgeModule],
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatSidenavModule,
+    MatTooltipModule,
+    MatBadgeModule,
+    MatProgressSpinnerModule,
+    MenuComponent
+  ],
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
 })
-export class LayoutComponent implements OnInit, OnDestroy {
+export class LayoutComponent {
   @ViewChild('sidenav') sidenav!: MatSidenav;
+
   currentYear = new Date().getFullYear();
-  isCollapsed = false;
-  loadingService = inject(LoadingService);
-  private syncService = inject(SyncService);
-  private snackBar = inject(MatSnackBar);
-  private destroy$ = new Subject<void>();
-  private offlineSnackBarRef: MatSnackBarRef<any> | null = null;
-  showSyncButton$!: Observable<boolean>;
-  pendingRequestCount$!: Observable<number>;
+  showSyncButton$: Observable<boolean>;
+  pendingRequestCount$: Observable<number>;
 
-  ngOnInit(): void {
-    const isOnline$ = this.syncService.isOnline();
-    const pendingRequests$ = this.syncService.getPendingRequestCount().pipe(startWith(0));
-    this.pendingRequestCount$ = pendingRequests$;
-
-    isOnline$.pipe(takeUntil(this.destroy$))
-      .subscribe(isOnline => {
-        if (!isOnline) {
-          this.offlineSnackBarRef = this.snackBar.open('You are currently offline.', 'Dismiss', {
-            panelClass: ['warn-snackbar']
-          });
-        } else {
-          this.offlineSnackBarRef?.dismiss();
-        }
-      });
-
-    this.showSyncButton$ = combineLatest([isOnline$, pendingRequests$]).pipe(
-      map(([isOnline, count]) => isOnline && count > 0)
-    );
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  constructor(
+    public loadingService: LoadingService,
+    private syncService: SyncService,
+    private router: Router
+  ) {
+    this.showSyncButton$ = this.syncService.isOnline();
+    this.pendingRequestCount$ = this.syncService.getPendingRequestCount();
   }
 
   toggleCollapse(): void {
@@ -66,8 +56,11 @@ export class LayoutComponent implements OnInit, OnDestroy {
     this.sidenav.close();
   }
 
+  navigateToHome(): void {
+    this.router.navigate(['/dashboard']);
+  }
+
   onSyncNow(): void {
-    this.snackBar.open('Syncing pending changes...', undefined, { duration: 2000 });
     this.syncService.processQueue();
   }
 }
