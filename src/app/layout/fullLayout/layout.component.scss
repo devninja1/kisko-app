@@ -1,7 +1,12 @@
 .header {
   position: sticky; // or 'fixed' if you prefer
   top: 0;
-  z-index: 2001; // Ensure toolbar is always on top, even above loading overlay
+  z-index: 800; // Ensure toolbar is always on top, even above loading overlay
+}
+
+
+.sidenav-width {
+  width: 250px; /* You can adjust this value to your desired width */
 }
 
 .home-link {
@@ -25,7 +30,7 @@
 
 .loading-overlay {
   position: absolute;
-  top: 0;
+  top: 50px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -33,7 +38,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 2000;
+  z-index: 890;
 }
 
 .content-wrapper {

@@ -1,6 +1,7 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,7 +9,7 @@ import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Observable } from 'rxjs';
+import { Observable, map, shareReplay, take } from 'rxjs';
 
 import { MenuComponent } from '../menu/menu.component';
 import { LoadingService } from '../../core/services/loading.service';
@@ -38,6 +39,13 @@ export class LayoutComponent {
   currentYear = new Date().getFullYear();
   showSyncButton$: Observable<boolean>;
   pendingRequestCount$: Observable<number>;
+  private breakpointObserver = inject(BreakpointObserver);
+
+  isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
+    .pipe(
+      map(result => result.matches),
+      shareReplay()
+    );
 
   constructor(
     public loadingService: LoadingService,
@@ -53,7 +61,12 @@ export class LayoutComponent {
   }
 
   collapseMenu(): void {
-    this.sidenav.close();
+    // Only close if not a large screen
+    this.isHandset$.pipe(take(1)).subscribe(isHandset => {
+      if (isHandset) {
+        this.sidenav.close();
+      }
+    });
   }
 
   navigateToHome(): void {

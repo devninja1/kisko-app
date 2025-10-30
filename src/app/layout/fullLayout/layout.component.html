@@ -1,7 +1,9 @@
 <mat-toolbar color="primary" class="mat-elevation-z4 header">
-  <button mat-icon-button (click)="toggleCollapse()">
-    <mat-icon>menu</mat-icon>
-  </button>
+  @if (isHandset$ | async) {
+    <button mat-icon-button (click)="toggleCollapse()">
+      <mat-icon>menu</mat-icon>
+    </button>
+  }
   <button mat-button class="home-link" (click)="navigateToHome()">
     <mat-icon>storefront</mat-icon>
     <span>Kiosk App</span>
@@ -19,7 +21,11 @@
   }
 </mat-toolbar>
 <mat-sidenav-container class="app-container">
-  <mat-sidenav #sidenav mode="over" class="mat-elevation-z4">
+  <mat-sidenav #sidenav
+               class="mat-elevation-z4 sidenav-width"
+               [attr.role]="(isHandset$ | async) ? 'dialog' : 'navigation'"
+               [mode]="(isHandset$ | async) ? 'over' : 'side'"
+               [opened]="(isHandset$ | async) === false">
     <app-menu [collapsed]="false" (menuItemClicked)="collapseMenu()"></app-menu>
   </mat-sidenav>
 
