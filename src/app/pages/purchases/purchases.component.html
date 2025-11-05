@@ -1,16 +1,16 @@
-<div class="purchases-container">
+<div class="purchases-container" *ngIf="{ purchaseList: (purchaseList$ | async), addedNames: (addedProductNames$ | async) } as data">
   <app-purchase-entry
     [products]="(products$ | async)!"
-    [addedProductNames]="addedProductNames"
+    [addedProductNames]="data.addedNames!"
     (itemAdded)="onItemAdded($event)">
   </app-purchase-entry>
 
   <app-purchase-list
-    [purchaseList]="purchaseList"
+    [purchaseList]="data.purchaseList!"
     (itemDeleted)="onItemDeleted($event)">
   </app-purchase-list>
 
-  <div class="save-purchase-container" *ngIf="purchaseList.length > 0">
+  <div class="save-purchase-container" *ngIf="data.purchaseList && data.purchaseList.length > 0">
     <mat-form-field appearance="outline" class="supplier-field">
       <mat-label>Supplier (Optional)</mat-label>
       <mat-select [(ngModel)]="selectedSupplierId">

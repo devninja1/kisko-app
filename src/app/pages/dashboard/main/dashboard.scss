@@ -1,25 +1,50 @@
+:host {
+  display: block;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-background {
+  position: relative;
+  width: 100%;
+  isolation: isolate;
+  box-sizing: border-box;
+  flex-grow: 1;
+}
+
+.dashboard-background::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  // background-image: url('/images/blb-kisko-app.png');
+  // background-size: cover;
+  // background-position: center;
+  // opacity: 0.2; // Adjust for desired transparency
+  // z-index: -1;
+}
+
 .container {
   padding: 20px;
 }
 
 .welcome-header {
-  padding: 2rem;
-  margin-bottom: 20px;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  border-radius: 8px;
+  margin-bottom: 30px;
   text-align: center;
-  color: #4a6a8a; // A complementary, softer blue-grey for the subtitle
 
   h1 {
     margin: 0 0 0.5rem 0;
     font-weight: 300;
-    font-size: 2.5rem;
-    color: #1c3d5a; // A darker, more saturated blue for the title
+    font-size: 2rem;
+    color: #333;
   }
 
   p {
     margin: 0;
-    // The color is inherited from the parent .welcome-header
+    color: #666;
   }
 }
 

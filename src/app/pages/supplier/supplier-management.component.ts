@@ -30,7 +30,6 @@ import { ConfirmationDialogComponent } from '../../shared/components/confirmatio
     MatInputModule,
     MatDialogModule,
     MatSnackBarModule,
-    ConfirmationDialogComponent,
   ],
   templateUrl: './supplier-management.component.html',
   styleUrl: './supplier-management.component.scss'

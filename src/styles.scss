@@ -29,6 +29,11 @@ body {
   background-color: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-medium);
+  background-image: url('/images/blb-kisko-app.png');
+  background-size:unset;
+  background-position: center;
+  opacity: 0.9; // Adjust for desired transparency
+  z-index: -1; // Adjust for desired transparency
 
   // Reset the user agent margin.
   margin: 0;

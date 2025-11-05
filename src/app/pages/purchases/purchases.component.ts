@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject, catchError, EMPTY, merge, Observable, Subject, switchMap, takeUntil, tap } from 'rxjs';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatButtonModule } from '@angular/material/button';
+import { MatButtonModule, MatButton } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
@@ -39,11 +39,21 @@ import { PurchaseListComponent } from './list/purchase-list.component';
 export class PurchasesComponent implements OnInit, OnDestroy {
   products$: Observable<Product[]>;
   suppliers$: Observable<Supplier[]>;
-  purchaseList: PurchaseItem[] = [];
-  addedProductNames = new Set<string>();
-  selectedSupplierId: number | null = null;
-  private destroy$ = new Subject<void>();
 
+  // State Management with Subjects
+  private purchaseListSubject = new BehaviorSubject<PurchaseItem[]>([]);
+  purchaseList$ = this.purchaseListSubject.asObservable();
+
+  private addedProductNamesSubject = new BehaviorSubject<Set<string>>(new Set());
+  addedProductNames$ = this.addedProductNamesSubject.asObservable();
+
+  selectedSupplierId: number | null = null;
+
+  // Action Streams
+  private saveAction$ = new Subject<void>();
+
+  private destroy$ = new Subject<void>();
+  
   constructor(
     private productService: ProductService,
     private supplierService: SupplierService,
@@ -54,56 +64,88 @@ export class PurchasesComponent implements OnInit, OnDestroy {
     this.suppliers$ = this.supplierService.getSuppliers();
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.handleSaveAction();
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  get grandTotal(): number {
-    if (!this.purchaseList || this.purchaseList.length === 0) {
-      return 0;
-    }
-    return this.purchaseList.reduce((acc, item) => acc + item.total, 0);
+  private handleSaveAction(): void {
+    this.saveAction$.pipe(
+      switchMap(() => {
+        const purchaseList = this.purchaseListSubject.getValue();
+        if (purchaseList.length === 0) {
+          this.snackBar.open('No items to save in purchase!', 'Close', { duration: 3000 });
+          return EMPTY;
+        }
+        const grandTotal = purchaseList.reduce((acc, item) => acc + item.total, 0);
+        return this.purchaseService.savePurchase({
+          items: purchaseList,
+          grandTotal: grandTotal,
+          supplierId: this.selectedSupplierId,
+          date: new Date(),
+        });
+      }),
+      tap(() => {
+        this.snackBar.open('Purchase saved successfully!', 'Close', { duration: 3000 });
+        this.resetPurchase();
+      }),
+      catchError(err => {
+        this.snackBar.open('Failed to save purchase.', 'Close', { duration: 3000 });
+        console.error(err);
+        return EMPTY;
+      }),
+      takeUntil(this.destroy$)
+    ).subscribe();
   }
 
   onItemAdded(newItem: PurchaseItem) {
-    // When a purchase is made, the stock increases.
-    this.productService.updateStock(newItem.product.id, newItem.quantity).pipe(takeUntil(this.destroy$)).subscribe();
-    this.purchaseList = [...this.purchaseList, newItem];
-    this.addedProductNames.add(newItem.product.name);
+    this.productService.updateStock(newItem.product.id, newItem.quantity).pipe(
+      takeUntil(this.destroy$),
+      catchError(() => {
+        this.snackBar.open('Failed to update stock for new item.', 'Close', { duration: 3000 });
+        return EMPTY;
+      })
+    ).subscribe(() => {
+      const currentList = this.purchaseListSubject.getValue();
+      this.purchaseListSubject.next([...currentList, newItem]);
+
+      const currentNames = this.addedProductNamesSubject.getValue();
+      currentNames.add(newItem.product.name);
+      this.addedProductNamesSubject.next(currentNames);
+    });
   }
 
   onItemDeleted(index: number) {
-    const deletedItem = this.purchaseList[index];
+    const currentList = this.purchaseListSubject.getValue();
+    const deletedItem = currentList[index];
     if (deletedItem) {
-      // When a purchase item is removed, the stock decreases.
-      this.productService.updateStock(deletedItem.product.id, -deletedItem.quantity).pipe(takeUntil(this.destroy$)).subscribe();
-      this.addedProductNames.delete(deletedItem.product.name);
-      this.purchaseList = this.purchaseList.filter((_, i: number) => i !== index);
+      this.productService.updateStock(deletedItem.product.id, -deletedItem.quantity).pipe(
+        takeUntil(this.destroy$),
+        catchError(() => {
+          this.snackBar.open('Failed to update stock for deleted item.', 'Close', { duration: 3000 });
+          return EMPTY;
+        })
+      ).subscribe(() => {
+        const updatedList = currentList.filter((_, i) => i !== index);
+        this.purchaseListSubject.next(updatedList);
+
+        const currentNames = this.addedProductNamesSubject.getValue();
+        currentNames.delete(deletedItem.product.name);
+        this.addedProductNamesSubject.next(currentNames);
+      });
     }
   }
 
   savePurchase() {
-    if (this.purchaseList.length === 0) {
-      this.snackBar.open('No items to save in purchase!', 'Close', { duration: 3000 });
-      return;
-    }
-
-    this.purchaseService
-      .savePurchase({
-        items: this.purchaseList,
-        grandTotal: this.grandTotal,
-        supplierId: this.selectedSupplierId,
-        date: new Date(),
-      })
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(() => {
-        this.snackBar.open('Purchase saved successfully!', 'Close', { duration: 3000 });
-        this.purchaseList = [];
-        this.selectedSupplierId = null;
-        this.addedProductNames.clear();
-      });
+    this.saveAction$.next();
+  }
+  private resetPurchase(): void {
+    this.purchaseListSubject.next([]);
+    this.addedProductNamesSubject.next(new Set());
+    this.selectedSupplierId = null;
   }
 }

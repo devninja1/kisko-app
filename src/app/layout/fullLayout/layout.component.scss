@@ -26,6 +26,7 @@
 .app-container {
   position: relative; // Ensures proper stacking context for the content
   height: calc(100vh - 64px); // Adjust based on your toolbar height
+  isolation: isolate;// Create a new stacking context
 }
 
 .loading-overlay {
