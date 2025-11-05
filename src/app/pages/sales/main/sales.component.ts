@@ -60,7 +60,9 @@ export class SalesComponent implements OnInit {
     public dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {
-    this.products$ = this.productService.getProducts();
+    this.products$ = this.productService.getProducts().pipe(
+      map(products => products.filter(p => p.is_active))
+    );
   }
 
   ngOnInit(): void {
@@ -88,8 +90,8 @@ export class SalesComponent implements OnInit {
 
       // Update quantity, rate, and total
       existingItem.quantity += newItem.quantity;
-      existingItem.product.rate = newItem.product.rate; // Use the latest rate
-      existingItem.total = existingItem.product.rate * existingItem.quantity;
+      existingItem.product.unit_price = newItem.product.unit_price; // Use the latest rate
+      existingItem.total = existingItem.product.unit_price * existingItem.quantity;
 
       this.salesList = updatedSalesList;
     } else {

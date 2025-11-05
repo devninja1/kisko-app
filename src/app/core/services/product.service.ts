@@ -13,11 +13,11 @@ export class ProductService {
   private isOnline = navigator.onLine;
   private products$ = new BehaviorSubject<Product[]>([]);
   private defaultProducts: Product[] = [
-    { id: 1, name: 'Laptop Pro', rate: 1200, stock: 10 },
-    { id: 2, name: 'Wireless Mouse', rate: 25, stock: 50 },
-    { id: 3, name: 'Mechanical Keyboard', rate: 95, stock: 25 },
-    { id: 4, name: '4K Monitor', rate: 450, stock: 15 },
-    { id: 5, name: 'Webcam HD', rate: 60, stock: 30 },
+    { id: 1, name: 'Laptop Pro', category: 'Electronics', description: 'A powerful laptop for professionals', unit_price: 1200, cost_price: 950, stock: 10, is_active: true },
+    { id: 2, name: 'Wireless Mouse', category: 'Accessories', description: 'Ergonomic wireless mouse', unit_price: 25, cost_price: 15, stock: 50, is_active: true },
+    { id: 3, name: 'Mechanical Keyboard', category: 'Accessories', description: 'RGB Mechanical Keyboard', unit_price: 95, cost_price: 60, stock: 25, is_active: false },
+    { id: 4, name: '4K Monitor', category: 'Electronics', description: '27-inch 4K UHD Monitor', unit_price: 450, cost_price: 350, stock: 15, is_active: true },
+    { id: 5, name: 'Webcam HD', category: 'Accessories', description: '1080p HD Webcam for streaming', unit_price: 60, cost_price: 40, stock: 30, is_active: true },
   ];
 
   constructor(
@@ -50,11 +50,14 @@ export class ProductService {
 
   private syncWithApi() {
     this.http.get<Product[]>(this.apiUrl).subscribe((products: Product[]) => {
-      this.dbService.clear('products').subscribe(() => {
-        this.dbService.bulkAdd<Product>('products', products).subscribe(() => {
-          this.dbService.getAll<Product>('products').subscribe(prods => this.products$.next(prods));
+      // Only clear the local DB after successfully fetching from the API
+      if (products) {
+        this.dbService.clear('products').subscribe(() => {
+          this.dbService.bulkAdd<Product>('products', products).subscribe(() => {
+            this.dbService.getAll<Product>('products').subscribe(prods => this.products$.next(prods));
+          });
         });
-      });
+      }
     });
   }
 
@@ -65,7 +68,17 @@ export class ProductService {
   addProduct(productData: Omit<Product, 'id'>): Observable<Product> {
     // Optimistic update: add to local DB immediately with a temporary ID
     const tempId = -Date.now();
-    const tempProduct: Product = { ...productData, id: tempId, stock: productData.stock || 0 };
+    const tempProduct: Product = {
+      ...productData,
+      id: tempId,
+      cost_price: productData.cost_price || 0,
+      stock: productData.stock || 0,
+      is_active: productData.is_active ?? true,
+      description: productData.description || '',
+      unit_price: productData.unit_price || 0,
+      category: productData.category || '',
+      name: productData.name || '',
+    };
 
     return from(this.dbService.add<Product>('products', tempProduct)).pipe(
       tap(() => {
@@ -79,15 +92,26 @@ export class ProductService {
 
   updateProduct(updatedProduct: Product): Observable<Product> {
     this.syncService.addToQueue({ url: `${this.apiUrl}/${updatedProduct.id}`, method: 'PUT', payload: updatedProduct });
-    return from(this.dbService.update<Product>('products', updatedProduct)).pipe(
-      tap(() => this.loadInitialData()), // Refresh list
-      switchMap(() => of(updatedProduct))
-    );
+    return from(this.dbService.update<Product>('products', updatedProduct)).pipe(tap(() => {
+      // Optimistically update the local BehaviorSubject
+      const currentProducts = this.products$.getValue();
+      const index = currentProducts.findIndex(p => p.id === updatedProduct.id);
+      if (index !== -1) {
+        currentProducts[index] = updatedProduct;
+        this.products$.next([...currentProducts]);
+      }
+    }), switchMap(() => of(updatedProduct)));
   }
 
   deleteProduct(id: number): Observable<void> {
     this.syncService.addToQueue({ url: `${this.apiUrl}/${id}`, method: 'DELETE', payload: null });
-    return from(this.dbService.delete('products', id)).pipe(map(() => undefined));
+    return from(this.dbService.delete('products', id)).pipe(tap(() => {
+      const currentProducts = this.products$.getValue();
+      const updatedProducts = currentProducts.filter(p => p.id !== id);
+      this.products$.next(updatedProducts);
+    }),
+      map(() => undefined)
+    );
   }
 
   updateStock(productId: number, quantityChange: number): Observable<Product | undefined> {
@@ -102,7 +126,16 @@ export class ProductService {
         }
         return of(undefined);
       }),
-      tap(() => this.loadInitialData()) // Refresh list
+      tap((updatedProduct) => {
+        if (updatedProduct) {
+          const currentProducts = this.products$.getValue();
+          const index = currentProducts.findIndex(p => p.id === updatedProduct.id);
+          if (index !== -1) {
+            currentProducts[index] = updatedProduct;
+            this.products$.next([...currentProducts]);
+          }
+        }
+      })
     );
   }
 }

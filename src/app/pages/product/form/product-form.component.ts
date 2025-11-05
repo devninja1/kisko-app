@@ -5,6 +5,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
 import { Product } from '../../../model/product.model';
 
 @Component({
@@ -17,6 +19,8 @@ import { Product } from '../../../model/product.model';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatCheckboxModule,
+    MatSelectModule,
   ],
   templateUrl: './product-form.component.html',
   styleUrl: './product-form.component.scss',
@@ -27,12 +31,17 @@ export class ProductFormComponent {
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<ProductFormComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { product: Product }
+    @Inject(MAT_DIALOG_DATA) public data: { product?: Product }
   ) {
+    const product = data?.product;
     this.productForm = this.fb.group({
-      name: [data.product?.name || '', Validators.required],
-      rate: [data.product?.rate || 0, [Validators.required, Validators.min(0)]],
-      stock: [data.product?.stock || 0, [Validators.required, Validators.min(0)]],
+      name: [product?.name || '', Validators.required],
+      category: [product?.category || '', Validators.required],
+      description: [product?.description || ''],
+      cost_price: [product?.cost_price || 0, [Validators.required, Validators.min(0)]],
+      unit_price: [product?.unit_price || 0, [Validators.required, Validators.min(0)]],
+      stock: [product?.stock || 0, [Validators.required, Validators.min(0)]],
+      is_active: [product?.is_active ?? true],
     });
   }
 

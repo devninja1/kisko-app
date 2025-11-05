@@ -7,8 +7,24 @@
     </button>
   </div>
 
-  <div class="mat-elevation-z8 table-container">
-    <table mat-table [dataSource]="dataSource">
+  <div class="filter-controls">
+    <mat-form-field appearance="outline">
+      <mat-label>Search All</mat-label>
+      <input matInput (keyup)="applyFilter($event)" placeholder="Search products...">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Filter by Category</mat-label>
+      <mat-select [formControl]="categoryFilter">
+        <mat-option value="">All Categories</mat-option>
+        <mat-option *ngFor="let category of uniqueCategories" [value]="category">{{ category }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="mat-elevation-z8 table-container">  
+      
+    <table mat-table [dataSource]="dataSource" matSort>
 
       <!-- Name Column -->
       <ng-container matColumnDef="name">
@@ -16,16 +32,50 @@
         <td mat-cell *matCellDef="let product"> {{product.name}} </td>
       </ng-container>
 
-      <!-- Rate Column -->
-      <ng-container matColumnDef="rate">
-        <th mat-header-cell *matHeaderCellDef> Rate </th>
-        <td mat-cell *matCellDef="let product"> {{product.rate | currency:'INR':'symbol'}} </td>
+      <!-- Category Column -->
+      <ng-container matColumnDef="category">
+        <th mat-header-cell *matHeaderCellDef> Category </th>
+        <td mat-cell *matCellDef="let product"> {{product.category}} </td>
+      </ng-container>
+
+      <!-- Description Column -->
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef> Description </th>
+        <td mat-cell *matCellDef="let product"> {{product.description}} </td>
+      </ng-container>
+
+      <!-- Cost Price Column -->
+      <ng-container matColumnDef="cost_price">
+        <th mat-header-cell *matHeaderCellDef> Cost Price </th>
+        <td mat-cell *matCellDef="let product"> {{product.cost_price | currency:'INR':'symbol'}} </td>
+      </ng-container>
+
+      <!-- Unit Price Column -->
+      <ng-container matColumnDef="unit_price">
+        <th mat-header-cell *matHeaderCellDef> Unit Price </th>
+        <td mat-cell *matCellDef="let product"> {{product.unit_price | currency:'INR':'symbol'}} </td>
+      </ng-container>
+
+      <!-- Profit Margin Column -->
+      <ng-container matColumnDef="profit_margin">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Profit Margin </th>
+        <td mat-cell *matCellDef="let product">
+          {{ (product.unit_price > 0 ? ((product.unit_price - product.cost_price) / product.unit_price) : 0) | percent:'1.2-2' }}
+        </td>
       </ng-container>
 
       <!-- Stock Column -->
       <ng-container matColumnDef="stock">
         <th mat-header-cell *matHeaderCellDef> Stock </th>
         <td mat-cell *matCellDef="let product"> {{product.stock}} </td>
+      </ng-container>
+
+      <!-- Is Active Column -->
+      <ng-container matColumnDef="is_active">
+        <th mat-header-cell *matHeaderCellDef> Active </th>
+        <td mat-cell *matCellDef="let product">
+          <mat-icon [color]="product.is_active ? 'primary' : 'warn'">{{ product.is_active ? 'check_circle' : 'cancel' }}</mat-icon>
+        </td>
       </ng-container>
 
       <!-- Actions Column -->

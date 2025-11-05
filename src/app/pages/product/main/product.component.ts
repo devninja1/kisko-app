@@ -1,18 +1,21 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { Product } from '../../../model/product.model';
 import { ProductFormComponent } from '../form/product-form.component';
 import { ProductService } from '../../../core/services/product.service';
 import { ConfirmationDialogComponent } from '../../../shared/components/confirmation-dialog/confirmation-dialog.component';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-product',
@@ -27,14 +30,20 @@ import { ConfirmationDialogComponent } from '../../../shared/components/confirma
     MatSnackBarModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
+    ReactiveFormsModule,
     MatIconModule,
   ],
   templateUrl: './product.component.html',
   styleUrl: './product.component.scss'
 })
 export class ProductComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['name', 'rate', 'stock', 'actions'];
+  displayedColumns: string[] = ['name', 'category', 'description', 'cost_price', 'unit_price', 'profit_margin', 'stock', 'is_active', 'actions'];
   dataSource: MatTableDataSource<Product>;
+  
+  categoryFilter = new FormControl('');
+  uniqueCategories: string[] = [];
+  private filterValues = { global: '', category: '' };
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -44,23 +53,53 @@ export class ProductComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.loadProducts();
-  }
-
-  loadProducts(): void {
-    this.productService.getProducts().subscribe(products => {
-      this.dataSource.data = products;
+    this.categoryFilter.valueChanges.subscribe(value => {
+      this.filterValues.category = value || '';
+      this.dataSource.filter = JSON.stringify(this.filterValues);
     });
   }
 
   ngAfterViewInit() {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+    this.dataSource.filterPredicate = (data: Product, filter: string): boolean => {
+      const searchTerms = JSON.parse(filter);
+
+      // Combine all searchable string properties of the product
+      const dataStr = [data.name, data.description, data.category, data.cost_price, data.unit_price, data.stock]
+        .filter(Boolean) // Filter out null/undefined values
+        .join(' ')
+        .toLowerCase();
+
+      const globalMatch = dataStr.includes(searchTerms.global.trim().toLowerCase());
+      const categoryMatch = searchTerms.category ? data.category.toLowerCase() === searchTerms.category.toLowerCase() : true;
+
+      return globalMatch && categoryMatch;
+    };
+    // Custom sorting for calculated 'profit_margin' column
+    this.dataSource.sortingDataAccessor = (item, property) => {
+      switch (property) {
+        case 'profit_margin':
+          if (item.unit_price === 0) return 0;
+          return (item.unit_price - item.cost_price) / item.unit_price;
+        default:
+          return (item as any)[property];
+      }
+    };
+
+    // The getProducts() returns a BehaviorSubject, so we can subscribe to it.
+    // The table will update automatically whenever the service emits new data.
+    this.productService.getProducts().subscribe(products => {
+      this.dataSource.data = products;
+      this.uniqueCategories = [...new Set(products.map(p => p.category))].sort();
+      // Re-apply the filter in case the data changed
+      this.dataSource.filter = JSON.stringify(this.filterValues);
+    });
   }
 
   applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
+    this.filterValues.global = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = JSON.stringify(this.filterValues);
   }
 
   openProductForm(product?: Product): void {
@@ -72,9 +111,9 @@ export class ProductComponent implements OnInit, AfterViewInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         if (product) {
-          this.productService.updateProduct({ ...product, ...result }).subscribe(() => this.loadProducts());
+          this.productService.updateProduct({ ...product, ...result }).subscribe();
         } else {
-          this.productService.addProduct(result).subscribe(() => this.loadProducts());
+          this.productService.addProduct(result).subscribe();
         }
       }
     });
@@ -88,7 +127,7 @@ export class ProductComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.productService.deleteProduct(id).subscribe(() => this.loadProducts());
+        this.productService.deleteProduct(id).subscribe();
       }
     });
   }

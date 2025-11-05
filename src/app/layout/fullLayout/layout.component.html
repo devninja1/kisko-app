@@ -12,6 +12,7 @@
   @if (showSyncButton$ | async) {
     <button mat-icon-button
             (click)="onSyncNow()"
+            [disabled]="!(syncService.isOnline() | async)"
             matTooltip="Sync pending changes"
             [matBadge]="pendingRequestCount$ | async"
             matBadgeColor="warn"

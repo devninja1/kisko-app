@@ -67,7 +67,7 @@ export class SalesEntryComponent implements OnInit {
     this.selectedProduct = event.option.value;
     if (this.selectedProduct) {
       this.quantity = 1;
-      this.editableRate = this.selectedProduct.rate;
+      this.editableRate = this.selectedProduct.unit_price;
 
       setTimeout(() => {
         this.quantityInput.nativeElement.focus();
@@ -92,7 +92,7 @@ export class SalesEntryComponent implements OnInit {
     this.itemAdded.emit({
       product: {
         ...this.selectedProduct,
-        rate: this.editableRate,
+        unit_price: this.editableRate,
       },
       quantity: this.quantity,
       total: this.totalAmount,

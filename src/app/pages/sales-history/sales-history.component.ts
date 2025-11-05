@@ -1,10 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { Sale } from '../../model/sale.model';
+import { SalesItem } from '../../model/sales.model';
 import { SalesService } from '../../core/services/sales.service';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-sales-history',
@@ -16,23 +24,101 @@ import { SalesService } from '../../core/services/sales.service';
     MatButtonModule,
     CurrencyPipe,
     DatePipe,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatPaginatorModule,
   ],
   templateUrl: './sales-history.component.html',
   styleUrl: './sales-history.component.scss',
 })
-export class SalesHistoryComponent implements OnInit {
+export class SalesHistoryComponent implements OnInit, AfterViewInit {
   dataSource: MatTableDataSource<Sale>;
   columnsToDisplay = ['expand', 'id', 'customer', 'date', 'grandTotal', 'actions'];
   expandedElement: Sale | null = null;
+  private originalData: Sale[] = [];
 
-  constructor(private salesService: SalesService) {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+  range = new FormGroup({
+    start: new FormControl<Date | null>(null),
+    end: new FormControl<Date | null>(null),
+  });
+
+  constructor(
+    private salesService: SalesService,
+    private router: Router,
+    private route: ActivatedRoute
+  ) {
     this.dataSource = new MatTableDataSource<Sale>([]);
   }
 
   ngOnInit(): void {
+    this.dataSource.filterPredicate = (data: Sale, filter: string) => {
+      if (!filter) return true;
+      const { start, end } = JSON.parse(filter);
+      if (!start || !end) return true;
+
+      const saleDate = new Date(data.date);
+      // Set time to 0 to compare dates only
+      saleDate.setHours(0, 0, 0, 0);
+      const startDate = new Date(start);
+      const endDate = new Date(end);
+
+      return saleDate >= startDate && saleDate <= endDate;
+    };
+
     this.salesService.getSales().subscribe(sales => {
       // Sort sales by most recent first
-      this.dataSource.data = sales.sort((a, b) => b.id - a.id);
+      this.originalData = sales.sort((a, b) => b.id - a.id);
+      this.dataSource.data = this.originalData;
+
+      // Check for initial query params after data is loaded
+      this.route.queryParamMap.subscribe(params => {
+        const start = params.get('start');
+        const end = params.get('end');
+        if (start && end) {
+          this.range.setValue({
+            start: new Date(start),
+            end: new Date(end)
+          }, { emitEvent: false }); // Prevent valueChanges from firing again
+          this.applyDateFilter();
+        }
+      });
+    });
+
+    this.range.valueChanges.subscribe(val => {
+      this.applyDateFilter();
+      this.updateUrlQueryParams();
+    });
+  }
+
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+  }
+
+  clearDateFilter(): void {
+    this.range.reset();
+    // The valueChanges subscription will handle filtering and URL update
+  }
+
+  private applyDateFilter(): void {
+    const { start, end } = this.range.value;
+    this.dataSource.filter = (start && end) ? JSON.stringify({ start, end }) : '';
+  }
+
+  private updateUrlQueryParams(): void {
+    const { start, end } = this.range.value;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: {
+        start: start ? start.toISOString().split('T')[0] : null,
+        end: end ? end.toISOString().split('T')[0] : null,
+      },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
     });
   }
 
@@ -44,7 +130,7 @@ export class SalesHistoryComponent implements OnInit {
       <tr>
         <td>${item.product.name}</td>
         <td class="text-right">${item.quantity}</td>
-        <td class="text-right">${currencyPipe.transform(item.product.rate)}</td>
+        <td class="text-right">${currencyPipe.transform(item.product.unit_price)}</td>
         <td class="text-right">${currencyPipe.transform(item.total)}</td>
       </tr>
     `).join('');
@@ -106,5 +192,9 @@ export class SalesHistoryComponent implements OnInit {
     printWindow?.document.write(receiptContent);
     printWindow?.document.close();
     printWindow?.print();
+  }
+
+  trackByProduct(index: number, item: SalesItem): number {
+    return item.product.id;
   }
 }

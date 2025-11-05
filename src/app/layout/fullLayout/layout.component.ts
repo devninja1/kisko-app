@@ -49,11 +49,13 @@ export class LayoutComponent {
 
   constructor(
     public loadingService: LoadingService,
-    private syncService: SyncService,
+    public syncService: SyncService,
     private router: Router
   ) {
-    this.showSyncButton$ = this.syncService.isOnline();
     this.pendingRequestCount$ = this.syncService.getPendingRequestCount();
+    this.showSyncButton$ = this.pendingRequestCount$.pipe(
+      map(count => count > 0)
+    );
   }
 
   toggleCollapse(): void {
