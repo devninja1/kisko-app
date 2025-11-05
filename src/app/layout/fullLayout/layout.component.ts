@@ -74,7 +74,6 @@ export class LayoutComponent {
   navigateToHome(): void {
     this.router.navigate(['/dashboard']);
   }
-
   onSyncNow(): void {
     this.syncService.processQueue();
   }

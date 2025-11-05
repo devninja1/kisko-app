@@ -83,6 +83,7 @@ export class SyncService {
         this.http.request(req.method, req.url, { body: req.payload }).subscribe({
           next: (response: any) => {
             if (req.method === 'POST' && req.payload?.tempId) {
+              this.snackBar.open('An item was synced successfully.', 'Close', { duration: 2000 });
               // This was an offline creation, we need to update the local record
               let storeName;
               if (req.url.includes('products')) {
@@ -91,6 +92,8 @@ export class SyncService {
                 storeName = 'customers';
               } else if (req.url.includes('sales')) {
                 storeName = 'sales';
+              } else if (req.url.includes('purchases')) {
+                storeName = 'purchases';
               }
               if (storeName) {
                 this.handleSuccessfulPost(storeName, req.payload.tempId, response);
@@ -98,6 +101,7 @@ export class SyncService {
             }
             // On success, remove from queue
             this.dbService.delete('sync-queue', req.id!).subscribe(() => {
+              if (req.method !== 'POST') this.snackBar.open('An item was synced successfully.', 'Close', { duration: 2000 });
               this.refreshQueues();
             });
           },

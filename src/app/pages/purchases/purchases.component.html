@@ -1,0 +1,26 @@
+<div class="purchases-container">
+  <app-purchase-entry
+    [products]="(products$ | async)!"
+    [addedProductNames]="addedProductNames"
+    (itemAdded)="onItemAdded($event)">
+  </app-purchase-entry>
+
+  <app-purchase-list
+    [purchaseList]="purchaseList"
+    (itemDeleted)="onItemDeleted($event)">
+  </app-purchase-list>
+
+  <div class="save-purchase-container" *ngIf="purchaseList.length > 0">
+    <mat-form-field appearance="outline" class="supplier-field">
+      <mat-label>Supplier (Optional)</mat-label>
+      <mat-select [(ngModel)]="selectedSupplierId">
+        <mat-option *ngFor="let supplier of (suppliers$ | async)" [value]="supplier.id">
+          {{ supplier.name }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <button mat-raised-button color="primary" class="save-button" (click)="savePurchase()">
+      <mat-icon>save</mat-icon> Save Purchase
+    </button>
+  </div>
+</div>

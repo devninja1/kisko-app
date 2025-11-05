@@ -27,12 +27,27 @@ const dbConfig: DBConfig = {
     storeSchema: [
       { name: 'name', keypath: 'name', options: { unique: false } }
     ]
-  }, {
+  },
+  {
+      store: 'purchases',
+      storeConfig: { keyPath: 'id', autoIncrement: true },
+      storeSchema: [
+        { name: 'supplierId', keypath: 'supplierId', options: { unique: false } },
+        { name: 'date', keypath: 'date', options: { unique: false } },
+      ]
+    },
+  {
     store: 'sales',
     storeConfig: { keyPath: 'id', autoIncrement: true },
     storeSchema: [
       { name: 'date', keypath: 'date', options: { unique: false } },
       { name: 'grandTotal', keypath: 'grandTotal', options: { unique: false } }
+    ]
+  }, {
+    store: 'suppliers',
+    storeConfig: { keyPath: 'id', autoIncrement: true },
+    storeSchema: [
+      { name: 'name', keypath: 'name', options: { unique: false } }
     ]
   }, {
     store: 'failed-sync-queue',

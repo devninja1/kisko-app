@@ -1,0 +1,28 @@
+@if (purchaseList.length > 0) {
+  <mat-card>
+    <mat-card-title>Current Purchase</mat-card-title>
+    <mat-card-content>
+      <div class="purchase-list-header">
+        <span class="col-product">Product</span>
+        <span class="col-cost-price">Cost Price</span>
+        <span class="col-qty">Qty</span>
+        <span class="col-total">Total</span>
+        <span class="col-actions"></span>
+      </div>
+      @for (item of purchaseList; track trackByProduct(i, item); let i = $index) {
+        <div class="purchase-list-item">
+          <span class="col-product">{{ item.product.name }}</span>
+          <span class="col-cost-price">{{ item.product.cost_price | currency:'INR':'symbol' }}</span>
+          <span class="col-qty">{{ item.quantity }}</span>
+          <span class="col-total">{{ item.total | currency:'INR':'symbol' }}</span>
+          <span class="col-actions">
+            <button mat-icon-button color="warn" (click)="deleteItem(i)" aria-label="Delete item">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </span>
+        </div>
+      }
+      <div class="purchase-list-footer">Grand Total: {{ grandTotal | currency:'INR':'symbol' }}</div>
+    </mat-card-content>
+  </mat-card>
+}

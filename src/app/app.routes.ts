@@ -5,10 +5,16 @@ import { ProductComponent } from './pages/product/main/product.component';
 import { CustomerComponent } from './pages/customer/customer.component';
 import { SalesHistoryComponent } from './pages/sales-history/sales-history.component';
 import { SyncStatusComponent } from './pages/sync-status/sync-status.component';
+import { SupplierManagementComponent } from './pages/supplier/supplier-management.component';
+import { PurchaseHistoryComponent } from './pages/purchases/history/purchase-history.component';
+import { PurchasesComponent } from './pages/purchases/purchases.component';
 
 export const routes: Routes = [
   { path: 'dashboard', component: Dashboard },
+  { path: 'suppliers', component: SupplierManagementComponent },
   { path: 'sales', component: SalesComponent },
+  { path: 'purchase-history', component: PurchaseHistoryComponent },
+  { path: 'purchases', component: PurchasesComponent }, 
   { path: 'products', component: ProductComponent },
   { path: 'customers', component: CustomerComponent },
   { path: 'saleshistory', component: SalesHistoryComponent },

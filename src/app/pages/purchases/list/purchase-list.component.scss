@@ -1,0 +1,34 @@
+mat-card-title {
+  text-align: center;
+}
+
+.purchase-list-header,
+.purchase-list-item {
+  display: grid;
+  grid-template-columns: 3fr 1fr 1fr 1fr auto;
+  gap: 16px;
+  padding: 12px 8px;
+  align-items: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.purchase-list-header {
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.54);
+  border-bottom-width: 2px;
+  border-bottom-color: rgba(0, 0, 0, 0.12);
+}
+
+.col-cost-price, .col-qty, .col-total, .col-actions {
+  text-align: right;
+}
+
+.purchase-list-footer {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 1.25em;
+  font-weight: 700;
+  padding: 16px 8px 0;
+  margin-top: 8px;
+  border-top: 2px solid var(--mat-primary-500, #00bcd4);
+}

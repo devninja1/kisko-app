@@ -1,0 +1,19 @@
+.supplier-management-container {
+  padding: 20px;
+
+  h2 {
+    margin-bottom: 20px;
+    color: #3f51b5; /* Primary color */
+  }
+
+  .header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .filter-field {
+    width: 300px;
+  }
+}

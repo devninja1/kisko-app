@@ -1,0 +1,48 @@
+<mat-card>
+  <mat-card-title>Create Purchase</mat-card-title>
+  <mat-card-content>
+    <!-- Product Search -->
+    <mat-form-field class="full-width">
+      <mat-label>Search Product</mat-label>
+      <input #productSearchInput type="text" matInput [formControl]="productSearch" [matAutocomplete]="auto" />
+      <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayProduct"
+        (optionSelected)="onProductSelected($event)" class="product-autocomplete">
+        @for (product of filteredProducts | async; track product.id) {
+        <mat-option [value]="product" [class.added-product]="isProductAdded(product.name)">
+          <span class="product-name">{{ product.name }}</span>
+          <span class="stock-info">(Stock: {{ product.stock }})</span>
+          <span class="fill-remaining-space"></span>
+          @if (isProductAdded(product.name)) {
+          <mat-icon class="added-icon">check_circle</mat-icon>
+          }
+        </mat-option>
+        }
+      </mat-autocomplete>
+    </mat-form-field>
+
+    <!-- Selected Product Details -->
+    @if (selectedProduct) {
+    <div class="purchase-details">
+      <mat-form-field class="cost-price-input">
+        <mat-label>Cost Price</mat-label>
+        <input matInput type="number" [(ngModel)]="editableCostPrice" min="0" />
+      </mat-form-field>
+
+      <mat-form-field class="quantity-input">
+        <mat-label>Quantity</mat-label>
+        <input #quantityInput matInput type="number" [(ngModel)]="quantity" (keyup.enter)="addItem()" min="1" />
+      </mat-form-field>
+
+      <div class="detail-item total">
+        <span class="label">Total:</span>
+        <span class="value">{{ totalAmount | currency:'INR':'symbol':'1.2-2' }}</span>
+      </div>
+
+      <button mat-flat-button color="primary" (click)="addItem()" class="add-button">
+        Add to List
+      </button>
+    </div>
+    }
+
+  </mat-card-content>
+</mat-card>
