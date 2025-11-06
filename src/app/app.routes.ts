@@ -8,6 +8,7 @@ import { SyncStatusComponent } from './pages/sync-status/sync-status.component';
 import { SupplierManagementComponent } from './pages/supplier/supplier-management.component';
 import { PurchaseHistoryComponent } from './pages/purchases/history/purchase-history.component';
 import { PurchasesComponent } from './pages/purchases/purchases.component';
+import { InventoryComponent } from './pages/inventory/inventory.component';
 
 export const routes: Routes = [
   { path: 'dashboard', component: Dashboard },
@@ -16,6 +17,7 @@ export const routes: Routes = [
   { path: 'purchase-history', component: PurchaseHistoryComponent },
   { path: 'purchases', component: PurchasesComponent }, 
   { path: 'products', component: ProductComponent },
+  { path: 'inventory', component: InventoryComponent },
   { path: 'customers', component: CustomerComponent },
   { path: 'saleshistory', component: SalesHistoryComponent },
   { path: 'sync-status', component: SyncStatusComponent },

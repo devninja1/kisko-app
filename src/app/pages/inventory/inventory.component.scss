@@ -1,0 +1,63 @@
+.inventory-page-container {
+  padding: 24px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+  }
+}
+
+.filter-controls {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.search-field {
+  flex: 2 1 300px;
+}
+
+.date-range-field {
+  flex: 2 1 300px;
+}
+
+.inventory-section {
+  margin-bottom: 48px;
+}
+
+.table-container {
+  overflow: auto;
+}
+
+.table-container-with-paginator {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+}
+
+.low-stock-row {
+  background-color: #fff3e0; // A light orange to indicate warning
+}
+.lost-inventory-row {
+  background-color: #ffebee; // A light red to indicate error/lost
+  font-weight: 500;
+}
+
+.status-chip {
+  padding: 4px 8px;
+  border-radius: 12px;
+  color: white;
+  font-size: 12px;
+}
+.status-in-stock { background-color: #4CAF50; /* Green */ }
+.status-low-stock { background-color: #FFC107; /* Amber */ }
+.status-out-of-stock { background-color: #F44336; /* Red */ }
+.status-lost { background-color: #b71c1c; /* Dark Red */ }

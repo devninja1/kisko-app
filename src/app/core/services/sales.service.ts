@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { from, Observable, of, tap, BehaviorSubject } from 'rxjs';
+import { from, Observable, of, tap, BehaviorSubject, switchMap, forkJoin } from 'rxjs';
 import { NgxIndexedDBService } from 'ngx-indexed-db';
 import { Sale } from '../../model/sale.model';
 import { SyncService } from './sync.service';
+import { ProductService } from './product.service';
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +17,8 @@ export class SalesService {
   constructor(
     private http: HttpClient,
     private dbService: NgxIndexedDBService,
-    private syncService: SyncService
+    private syncService: SyncService,
+    private productService: ProductService // Inject ProductService
   ) {
     window.addEventListener('online', () => this.isOnline = true);
     window.addEventListener('offline', () => this.isOnline = false);
@@ -24,21 +26,25 @@ export class SalesService {
   }
 
   private loadInitialData(): void {
-    if (this.isOnline) {
-      this.syncWithApi();
-    } else {
-      this.dbService.getAll<Sale>('sales').subscribe(sales => this.sales$.next(sales));
-    }
+    this.dbService.getAll<Sale>('sales').pipe(
+      tap(sales => this.sales$.next(sales)),
+      switchMap(() => {
+        if (this.isOnline) {
+          return this.syncWithApi();
+        }
+        return of(null);
+      })
+    ).subscribe();
   }
 
-  private syncWithApi(): void {
-    this.http.get<Sale[]>(this.apiUrl).subscribe((sales: Sale[]) => {
-      this.dbService.clear('sales').subscribe(() => {
-        this.dbService.bulkAdd<Sale>('sales', sales).subscribe(() => {
-          this.dbService.getAll<Sale>('sales').subscribe(s => this.sales$.next(s));
-        });
-      });
-    });
+  private syncWithApi(): Observable<Sale[]> {
+    return this.http.get<Sale[]>(this.apiUrl).pipe(
+      switchMap(sales => this.dbService.clear('sales').pipe(
+        switchMap(() => this.dbService.bulkAdd<Sale>('sales', sales)),
+        switchMap(() => this.dbService.getAll<Sale>('sales'))
+      )),
+      tap(sales => this.sales$.next(sales))
+    );
   }
 
   getSales(): Observable<Sale[]> {
@@ -48,6 +54,11 @@ export class SalesService {
   saveSale(saleData: Omit<Sale, 'id'>): Observable<Sale> {
     const tempId = -Date.now();
     const tempSale: Sale = { ...saleData, id: tempId };
+
+    // Create an array of stock update observables
+    const stockUpdateObservables = saleData.items.map(item =>
+      this.productService.updateStock(item.product.id, -item.quantity) // Decrease stock
+    );
 
     return from(this.dbService.add<Sale>('sales', tempSale)).pipe(
       tap(() => {
@@ -59,7 +70,8 @@ export class SalesService {
           payload: { ...saleData, tempId }
         });
       }),
-      tap(() => of(tempSale))
+      // Execute all stock updates
+      switchMap(() => forkJoin(stockUpdateObservables).pipe(switchMap(() => of(tempSale))))
     );
   }
 }

@@ -20,6 +20,7 @@ export class MenuComponent {
     { name: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
     { name: 'Sales', icon: 'point_of_sale', route: '/sales' },
     { name: 'Products', icon: 'inventory_2', route: '/products' },
+    { name: 'Inventory', icon: 'inventory', route: '/inventory' },
     { name: 'Suppliers', icon: 'local_shipping', route: '/suppliers' },
     { name: 'Purchases', icon: 'shopping_cart', route: '/purchases' },
     { name: 'Purchase History', icon: 'receipt_long', route: '/purchase-history' },

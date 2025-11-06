@@ -54,6 +54,23 @@ const dbConfig: DBConfig = {
     storeConfig: { keyPath: 'id', autoIncrement: true },
     storeSchema: []
   }, {
+    store: 'inventory_inflow',
+    storeConfig: { keyPath: 'id', autoIncrement: true },
+    storeSchema: [
+      { name: 'product_id', keypath: 'product_id', options: { unique: false } },
+      { name: 'inflow_date', keypath: 'inflow_date', options: { unique: false } },
+      { name: 'quantity', keypath: 'quantity', options: { unique: false } },
+      { name: 'batch_no', keypath: 'batch_no', options: { unique: false } }
+    ]
+  }, {
+    store: 'inventory_outflow',
+    storeConfig: { keyPath: 'id', autoIncrement: true },
+    storeSchema: [
+      { name: 'product_id', keypath: 'product_id', options: { unique: false } },
+      { name: 'outflow_date', keypath: 'outflow_date', options: { unique: false } },
+      { name: 'quantity', keypath: 'quantity', options: { unique: false } }
+    ]
+  }, {
     store: 'sync-queue',
     storeConfig: { keyPath: 'id', autoIncrement: true },
     storeSchema: []
