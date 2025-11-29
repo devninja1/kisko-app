@@ -13,7 +13,7 @@ import { Observable, map, shareReplay, take } from 'rxjs';
 
 import { MenuComponent } from '../menu/menu.component';
 import { LoadingService } from '../../core/services/loading.service';
-import { SyncService } from '../../core/services/sync.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-layout',
@@ -35,10 +35,10 @@ import { SyncService } from '../../core/services/sync.service';
 })
 export class LayoutComponent {
   @ViewChild('sidenav') sidenav!: MatSidenav;
+  private authService = inject(AuthService);
+  readonly user$ = this.authService.user$;
 
   currentYear = new Date().getFullYear();
-  showSyncButton$: Observable<boolean>;
-  pendingRequestCount$: Observable<number>;
   private breakpointObserver = inject(BreakpointObserver);
 
   isHandset$: Observable<boolean> = this.breakpointObserver.observe(Breakpoints.Handset)
@@ -49,14 +49,8 @@ export class LayoutComponent {
 
   constructor(
     public loadingService: LoadingService,
-    public syncService: SyncService,
     private router: Router
-  ) {
-    this.pendingRequestCount$ = this.syncService.getPendingRequestCount();
-    this.showSyncButton$ = this.pendingRequestCount$.pipe(
-      map(count => count > 0)
-    );
-  }
+  ) {}
 
   toggleCollapse(): void {
     this.sidenav.toggle();
@@ -73,8 +67,5 @@ export class LayoutComponent {
 
   navigateToHome(): void {
     this.router.navigate(['/dashboard']);
-  }
-  onSyncNow(): void {
-    this.syncService.processQueue();
   }
 }

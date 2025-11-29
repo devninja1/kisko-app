@@ -9,17 +9,13 @@
     <span>BLB Kiosk App</span>
   </button>
   <span class="spacer"></span>
-  @if (showSyncButton$ | async) {
-    <button mat-icon-button
-            (click)="onSyncNow()"
-            [disabled]="!(syncService.isOnline() | async)"
-            matTooltip="Sync pending changes"
-            [matBadge]="pendingRequestCount$ | async"
-            matBadgeColor="warn"
-            [matBadgeHidden]="(pendingRequestCount$ | async) === 0">
-      <mat-icon>sync</mat-icon>
-    </button>
-  }
+<!-- src/app/layout/fullLayout/layout.component.html -->
+
+<!-- ... other html ... -->
+  <span class="user-email" >{{ (user$ | async)?.email }}</span>
+<!-- ... other html ... -->
+
+
 </mat-toolbar>
 <mat-sidenav-container class="app-container">
   <mat-sidenav #sidenav

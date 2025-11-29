@@ -61,7 +61,7 @@ export class SalesHistoryComponent implements OnInit, AfterViewInit {
       const { start, end } = JSON.parse(filter);
       if (!start || !end) return true;
 
-      const saleDate = new Date(data.date);
+      const saleDate = data.date.toDate();
       // Set time to 0 to compare dates only
       saleDate.setHours(0, 0, 0, 0);
       const startDate = new Date(start);
@@ -72,7 +72,7 @@ export class SalesHistoryComponent implements OnInit, AfterViewInit {
 
     this.salesService.getSales().subscribe(sales => {
       // Sort sales by most recent first
-      this.originalData = sales.sort((a, b) => b.id - a.id);
+      this.originalData = sales.sort((a, b) => b.date.toMillis() - a.date.toMillis());
       this.dataSource.data = this.originalData;
 
       // Check for initial query params after data is loaded
@@ -160,7 +160,7 @@ export class SalesHistoryComponent implements OnInit, AfterViewInit {
             <div class="header">
               <h2>Kisko App</h2>
               <p>Sale Receipt</p>
-              <p>Date: ${datePipe.transform(sale.date, 'short')}</p>
+              <p>Date: ${datePipe.transform(sale.date.toDate(), 'short')}</p>
               <p>Customer: ${sale.customerName ?? 'N/A'}</p>
             </div>
             <table class="items-table">
@@ -194,7 +194,7 @@ export class SalesHistoryComponent implements OnInit, AfterViewInit {
     printWindow?.print();
   }
 
-  trackByProduct(index: number, item: SalesItem): number {
-    return item.product.id;
+  trackByProduct(index: number, item: SalesItem): string {
+    return item.product.id.toString();
   }
 }

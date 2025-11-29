@@ -38,7 +38,7 @@ export class SupplierDialogComponent implements OnInit {
     this.supplierForm = this.fb.group({
       id: [this.data.id],
       name: [this.data.name, Validators.required],
-      contactPerson: [this.data.contactPerson],
+      contact_person: [this.data.contact_person],
       phone: [this.data.phone],
       email: [this.data.email, Validators.email],
     });

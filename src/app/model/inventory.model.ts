@@ -25,5 +25,5 @@ export interface ProductInventoryMetrics {
 export interface InventorySummary {
   inflowItems: InventoryInflowItem[];
   outflowItems: InventoryOutflowItem[];
-  productMetricsMap: Map<number, ProductInventoryMetrics>;
+  productMetricsMap: Map<string, ProductInventoryMetrics>;
 }

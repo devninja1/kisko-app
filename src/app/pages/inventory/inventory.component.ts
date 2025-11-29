@@ -62,7 +62,7 @@ export class InventoryComponent implements OnInit, AfterViewInit, OnDestroy {
   private allProducts: Product[] = [];
 
   // Map for period-specific calculations, now using the service's interface
-  private productMetricsMap = new Map<number, ProductInventoryMetrics>();
+  private productMetricsMap = new Map<string, ProductInventoryMetrics>();
 
   private destroy$ = new Subject<void>();
 
@@ -148,7 +148,7 @@ export class InventoryComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getOpeningStock(product: Product): number {
-    const metrics = this.productMetricsMap.get(product.id);
+    const metrics = this.productMetricsMap.get(product.id.toString());
     if (!metrics) return product.stock; // If no metrics for product, assume current stock is opening
 
     const qtyAdded = metrics.added;
@@ -159,17 +159,17 @@ export class InventoryComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getQuantityAdded(product: Product): number {
-    return this.productMetricsMap.get(product.id)?.added || 0;
+    return this.productMetricsMap.get(product.id.toString())?.added || 0;
   }
 
   getQuantitySold(product: Product): number {
-    return this.productMetricsMap.get(product.id)?.sold || 0;
+    return this.productMetricsMap.get(product.id.toString())?.sold || 0;
   }
 
   getQuantityAdjusted(product: Product): number {
     // This is a placeholder. For accurate tracking, stock adjustments
     // should be saved and fetched like sales/purchases.
-    return this.productMetricsMap.get(product.id)?.adjusted ?? 0;
+    return this.productMetricsMap.get(product.id.toString())?.adjusted ?? 0;
   } // This method is still needed for display, but its value comes from the map
 
   getStockStatus(product: Product): string {
@@ -219,8 +219,8 @@ export class InventoryComponent implements OnInit, AfterViewInit, OnDestroy {
    const amount = prompt(`Enter stock change for ${product.name} (current: ${product.stock})`, '0');
    if (amount !== null) {
      const change = parseInt(amount, 10);
-     if (!isNaN(change)) {
-       this.inventoryService.updateProductStock(product.id, change)
+     if (!isNaN(change) && product.id) {
+       this.inventoryService.updateProductStock(product.id.toString(), change)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
@@ -230,7 +230,7 @@ export class InventoryComponent implements OnInit, AfterViewInit, OnDestroy {
             product.stock += change;
             // To make "Lost/Adjusted" column work, we'd update its map here
             if (!this.dateRange.value.start && !this.dateRange.value.end) {
-                const metrics = this.productMetricsMap.get(product.id) || { sold: 0, added: 0, adjusted: 0 };
+                const metrics = this.productMetricsMap.get(product.id.toString()) || { sold: 0, added: 0, adjusted: 0 };
                 metrics.adjusted -= change;
                 this.calculateMetrics(); // Recalculate to update tables
             }

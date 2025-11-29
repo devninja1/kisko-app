@@ -78,7 +78,7 @@ export class SalesComponent implements OnInit {
 
   onItemAdded(newItem: SalesItem) {
     // Decrease stock from the master product list
-    this.productService.updateStock(newItem.product.id, -newItem.quantity).subscribe();
+    this.productService.updateStock(newItem.product.id.toString(), -newItem.quantity).subscribe();
     const existingItemIndex = this.salesList.findIndex(
       (saleItem) => saleItem.product.name === newItem.product.name
     );
@@ -134,7 +134,7 @@ export class SalesComponent implements OnInit {
   onItemDeleted(index: number) {
     const deletedItem = this.salesList[index];
     if (deletedItem) {
-      this.productService.updateStock(deletedItem.product.id, deletedItem.quantity).subscribe();
+      this.productService.updateStock(deletedItem.product.id.toString(), deletedItem.quantity).subscribe();
 
       this.addedProductNames.delete(deletedItem.product.name);
       // Create a new array to ensure change detection is triggered

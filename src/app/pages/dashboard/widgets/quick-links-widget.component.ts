@@ -56,7 +56,7 @@ export class QuickLinksWidgetComponent {
       map(sales => {
         const todayStart = new Date().setHours(0, 0, 0, 0);
         return sales
-          .filter(sale => new Date(sale.date).setHours(0, 0, 0, 0) === todayStart)
+          .filter(sale => sale.date.toDate().setHours(0, 0, 0, 0) === todayStart)
           .reduce((total, sale) => total + sale.grandTotal, 0);
       }),
       startWith(0)

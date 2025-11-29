@@ -47,7 +47,7 @@ export class PurchasesComponent implements OnInit, OnDestroy {
   private addedProductNamesSubject = new BehaviorSubject<Set<string>>(new Set());
   addedProductNames$ = this.addedProductNamesSubject.asObservable();
 
-  selectedSupplierId: number | null = null;
+  selectedSupplier: Supplier | null = null;
 
   // Action Streams
   private saveAction$ = new Subject<void>();
@@ -83,9 +83,9 @@ export class PurchasesComponent implements OnInit, OnDestroy {
         }
         const grandTotal = purchaseList.reduce((acc, item) => acc + item.total, 0);
         return this.purchaseService.savePurchase({
+          supplier: this.selectedSupplier,
           items: purchaseList,
           grandTotal: grandTotal,
-          supplierId: this.selectedSupplierId,
           date: new Date(),
         });
       }),
@@ -103,7 +103,7 @@ export class PurchasesComponent implements OnInit, OnDestroy {
   }
 
   onItemAdded(newItem: PurchaseItem) {
-    this.productService.updateStock(newItem.product.id, newItem.quantity).pipe(
+    this.productService.updateStock(newItem.product.id.toString(), newItem.quantity).pipe(
       takeUntil(this.destroy$),
       catchError(() => {
         this.snackBar.open('Failed to update stock for new item.', 'Close', { duration: 3000 });
@@ -123,7 +123,7 @@ export class PurchasesComponent implements OnInit, OnDestroy {
     const currentList = this.purchaseListSubject.getValue();
     const deletedItem = currentList[index];
     if (deletedItem) {
-      this.productService.updateStock(deletedItem.product.id, -deletedItem.quantity).pipe(
+      this.productService.updateStock(deletedItem.product.id.toString(), -deletedItem.quantity).pipe(
         takeUntil(this.destroy$),
         catchError(() => {
           this.snackBar.open('Failed to update stock for deleted item.', 'Close', { duration: 3000 });
@@ -146,6 +146,6 @@ export class PurchasesComponent implements OnInit, OnDestroy {
   private resetPurchase(): void {
     this.purchaseListSubject.next([]);
     this.addedProductNamesSubject.next(new Set());
-    this.selectedSupplierId = null;
+    this.selectedSupplier = null;
   }
 }

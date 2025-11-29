@@ -1,26 +1,29 @@
-<div class="purchases-container" *ngIf="{ purchaseList: (purchaseList$ | async), addedNames: (addedProductNames$ | async) } as data">
+@let purchaseList = purchaseList$ | async;
+@let addedNames = addedProductNames$ | async;
+
+<div class="purchases-container">
   <app-purchase-entry
-    [products]="(products$ | async)!"
-    [addedProductNames]="data.addedNames!"
     (itemAdded)="onItemAdded($event)">
   </app-purchase-entry>
 
   <app-purchase-list
-    [purchaseList]="data.purchaseList!"
+    [purchaseList]="purchaseList!"
     (itemDeleted)="onItemDeleted($event)">
   </app-purchase-list>
 
-  <div class="save-purchase-container" *ngIf="data.purchaseList && data.purchaseList.length > 0">
-    <mat-form-field appearance="outline" class="supplier-field">
-      <mat-label>Supplier (Optional)</mat-label>
-      <mat-select [(ngModel)]="selectedSupplierId">
-        <mat-option *ngFor="let supplier of (suppliers$ | async)" [value]="supplier.id">
-          {{ supplier.name }}
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-    <button mat-raised-button color="primary" class="save-button" (click)="savePurchase()">
-      <mat-icon>save</mat-icon> Save Purchase
-    </button>
-  </div>
+  @if (purchaseList && purchaseList.length > 0) {
+    <div class="save-purchase-container">
+      <mat-form-field appearance="outline" class="supplier-field">
+        <mat-label>Supplier (Optional)</mat-label>
+        <mat-select [(ngModel)]="selectedSupplier">
+          @for (supplier of (suppliers$ | async); track supplier.id) {
+            <mat-option [value]="supplier">{{ supplier.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <button mat-raised-button color="primary" class="save-button" (click)="savePurchase()">
+        <mat-icon>save</mat-icon> Save Purchase
+      </button>
+    </div>
+  }
 </div>

@@ -78,7 +78,7 @@ export class SupplierManagementComponent implements OnInit, AfterViewInit, OnDes
   openSupplierDialog(supplier?: Supplier): void {
     const dialogRef = this.dialog.open(SupplierDialogComponent, {
       width: '400px',
-      data: supplier ? { ...supplier } : { id: 0, name: '', contactPerson: '', phone: '', email: '' }
+      data: supplier ? { ...supplier } : { id: null, name: '', contact_person: '', phone: '', email: '' }
     });
 
     dialogRef.afterClosed().pipe(take(1)).subscribe(result => {
@@ -98,7 +98,7 @@ export class SupplierManagementComponent implements OnInit, AfterViewInit, OnDes
     });
   }
 
-  deleteSupplier(id: number): void {
+  deleteSupplier(id: string): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       width: '350px',
       data: { message: 'Are you sure you want to delete this supplier?' }

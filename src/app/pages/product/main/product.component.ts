@@ -119,7 +119,7 @@ export class ProductComponent implements OnInit, AfterViewInit {
     });
   }
 
-  deleteProduct(id: number): void {
+  deleteProduct(id: string): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       width: '350px',
       data: { message: 'Are you sure you want to delete this product?' }

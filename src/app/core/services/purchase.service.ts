@@ -1,73 +1,39 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, from, Observable, of, switchMap, map, tap, forkJoin } from 'rxjs';
-import { NgxIndexedDBService } from 'ngx-indexed-db';
-import { Purchase } from '../../model/purchase.model';
-import { SyncService } from './sync.service';
-import { ProductService } from './product.service';
+import { Injectable, inject } from '@angular/core';
+import { from, Observable } from 'rxjs';
+import {
+  Firestore,
+  collection,
+  collectionData,
+  addDoc,
+  Timestamp,
+} from '@angular/fire/firestore';
+import { Purchase, PurchaseToSave } from '../../model/purchase.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PurchaseService {
-  private apiUrl = 'http://localhost:3000/api/purchases';
-  private isOnline = navigator.onLine;
-  private purchases$ = new BehaviorSubject<Purchase[]>([]);
+  private firestore: Firestore = inject(Firestore);
+  private purchasesCollection = collection(this.firestore, 'purchases');
 
   constructor(
-    private http: HttpClient,
-    private dbService: NgxIndexedDBService,
-    private syncService: SyncService,
-    private productService: ProductService // Inject ProductService
-  ) {
-    window.addEventListener('online', () => this.isOnline = true);
-    window.addEventListener('offline', () => this.isOnline = false);
-    this.loadInitialData();
-  }
-
-  private loadInitialData(): void {
-    this.dbService.getAll<Purchase>('purchases').pipe(
-      tap(purchases => this.purchases$.next(purchases)),
-      switchMap(() => this.isOnline ? this.syncWithApi() : of(null))
-    ).subscribe();
-  }
-
-  private syncWithApi(): Observable<Purchase[]> {
-    return this.http.get<Purchase[]>(this.apiUrl).pipe(
-      switchMap(purchases => this.dbService.clear('purchases').pipe(
-        switchMap(() => this.dbService.bulkAdd('purchases', purchases)),
-        switchMap(() => this.dbService.getAll<Purchase>('purchases'))
-      )),
-      tap(purchases => this.purchases$.next(purchases))
-    );
-  }
+  ) {}
 
   getPurchases(): Observable<Purchase[]> {
-    return this.purchases$.asObservable();
+    return collectionData(this.purchasesCollection, { idField: 'id' }) as Observable<Purchase[]>;
   }
 
-  savePurchase(purchaseData: Omit<Purchase, 'id'>): Observable<Purchase> {
-    const tempId = -Date.now();
-    const purchaseToSave: Purchase = {
+  /**
+   * Saves a new purchase to Firestore.
+   * Firestore handles offline creation and syncs when the app is back online.
+   * @param purchaseData The purchase object to save.
+   */
+  savePurchase(purchaseData: PurchaseToSave): Observable<string> {
+    const purchaseWithTimestamp = {
       ...purchaseData,
-      id: tempId,
+      date: Timestamp.fromDate(new Date()), // Use Firestore Timestamp
     };
-
-    // Create an array of stock update observables
-    const stockUpdateObservables = purchaseData.items.map(item =>
-      this.productService.updateStock(item.product.id, item.quantity) // Increase stock
-    );
-
-    return from(this.dbService.add<Purchase>('purchases', purchaseToSave)).pipe(
-      tap(() => {
-        const currentPurchases = this.purchases$.getValue();
-        this.purchases$.next([...currentPurchases, purchaseToSave]);
-        this.syncService.addToQueue({
-          url: this.apiUrl, method: 'POST', payload: { ...purchaseData, tempId }
-        });
-      }),
-      // Execute all stock updates
-      switchMap(() => forkJoin(stockUpdateObservables).pipe(map(() => purchaseToSave)))
-    );
+    const promise = addDoc(this.purchasesCollection, purchaseWithTimestamp).then(docRef => docRef.id);
+    return from(promise);
   }
 }

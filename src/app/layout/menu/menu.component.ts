@@ -1,9 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-menu',
@@ -15,6 +16,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 export class MenuComponent {
   @Input() collapsed = false;
   @Output() menuItemClicked = new EventEmitter<void>();
+  private authService = inject(AuthService);
+  readonly user$ = this.authService.user$;
+  private router = inject(Router);
 
   menuItems = [
     { name: 'Dashboard', icon: 'dashboard', route: '/dashboard' },
@@ -25,8 +29,7 @@ export class MenuComponent {
     { name: 'Purchases', icon: 'shopping_cart', route: '/purchases' },
     { name: 'Purchase History', icon: 'receipt_long', route: '/purchase-history' },
     { name: 'Sales History', icon: 'history', route: '/saleshistory' },
-    { name: 'Customers', icon: 'people', route: '/customers' },
-    { name: 'Sync Status', icon: 'sync_problem', route: '/sync-status' },
+    { name: 'Customers', icon: 'people', route: '/customers' }, 
     { name: 'Settings', icon: 'settings', route: '/settings' },
   ];
 
@@ -34,8 +37,16 @@ export class MenuComponent {
     this.menuItemClicked.emit();
   }
 
-  logout(): void {
+  async logout(): Promise<void> {
     // Implement your logout logic here
     console.log('Logout clicked!');
+    try {
+      await this.authService.logout();
+      this.router.navigate(['/login']);
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Optionally, show a snackbar message on failure
+    }
   }
+
 }

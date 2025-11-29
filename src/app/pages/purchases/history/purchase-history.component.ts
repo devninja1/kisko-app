@@ -65,11 +65,10 @@ export class PurchaseHistoryComponent implements OnInit, AfterViewInit, OnDestro
       this.supplierService.getSuppliers()
     ]).pipe(
       map(([purchases, suppliers]) => {
-        const supplierMap = new Map<number, string>(suppliers.map(s => [s.id, s.name]));
         return purchases.map(p => ({
           ...p,
-          supplierName: p.supplierId ? supplierMap.get(p.supplierId) ?? 'N/A' : 'N/A'
-        }));
+          supplierName: p.supplier?.name ?? 'N/A' // Directly access the name from the nested supplier object
+        }) as PurchaseHistoryView);
       }),
       takeUntil(this.destroy$)
     ).subscribe(purchaseHistory => {

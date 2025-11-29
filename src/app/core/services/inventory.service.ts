@@ -8,18 +8,15 @@ import { Product } from '../../model/product.model';
 import { Sale } from '../../model/sale.model';
 import { Purchase, PurchaseItem } from '../../model/purchase.model';
 import { InventoryInflowItem, InventoryOutflowItem, InventorySummary, ProductInventoryMetrics } from '../../model/inventory.model';
-import { NgxIndexedDBService } from 'ngx-indexed-db';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InventoryService {
-
   constructor(
     private productService: ProductService,
     private salesService: SalesService,
-    private purchaseService: PurchaseService,
-    private dbService: NgxIndexedDBService
+    private purchaseService: PurchaseService
   ) {}
 
   /**
@@ -59,7 +56,7 @@ export class InventoryService {
     startDate: Date | null,
     endDate: Date | null
   ): InventorySummary {
-    const productMetricsMap = new Map<number, ProductInventoryMetrics>();
+    const productMetricsMap = new Map<string, ProductInventoryMetrics>();
     const inflowItems: InventoryInflowItem[] = [];
     const outflowItems: InventoryOutflowItem[] = [];
 
@@ -71,12 +68,12 @@ export class InventoryService {
       const endTimestamp = new Date(endDate.getTime() + 24 * 60 * 60 * 1000).getTime(); // Include full end day
 
       filteredSales = allSales.filter(sale => {
-        const saleTime = new Date(sale.date).getTime();
+        const saleTime = sale.date.toDate().getTime();
         return saleTime >= startTimestamp && saleTime <= endTimestamp;
       });
 
       filteredPurchases = allPurchases.filter(purchase => {
-        const purchaseTime = new Date(purchase.date).getTime();
+        const purchaseTime = purchase.date.toDate().getTime();
         return purchaseTime >= startTimestamp && purchaseTime <= endTimestamp;
       });
     }
@@ -87,12 +84,12 @@ export class InventoryService {
         outflowItems.push({
           product: item.product,
           quantity: item.quantity,
-          outflow_date: sale.date,
+          outflow_date: sale.date.toDate(),
           reason: 'Sale'
         });
-        const metrics = productMetricsMap.get(item.product.id) || { sold: 0, added: 0, adjusted: 0 };
+        const metrics = productMetricsMap.get(item.product.id.toString()) || { sold: 0, added: 0, adjusted: 0 };
         metrics.sold += item.quantity;
-        productMetricsMap.set(item.product.id, metrics);
+        productMetricsMap.set(item.product.id.toString(), metrics);
       }
     }
 
@@ -101,15 +98,15 @@ export class InventoryService {
       for (const item of purchase.items) {
         inflowItems.push({
           ...item,
-          inflow_date: purchase.date,
+          inflow_date: purchase.date.toDate(),
           batch_no: item.batch_no,
           expiry: item.expiry,
           source: purchase.supplier?.name,
           product: item.product // Ensure product is explicitly set
         });
-        const metrics = productMetricsMap.get(item.product.id) || { sold: 0, added: 0, adjusted: 0 };
+        const metrics = productMetricsMap.get(item.product.id.toString()) || { sold: 0, added: 0, adjusted: 0 };
         metrics.added += item.quantity;
-        productMetricsMap.set(item.product.id, metrics);
+        productMetricsMap.set(item.product.id.toString(), metrics);
       }
     }
 
@@ -129,7 +126,7 @@ export class InventoryService {
    * @param change The quantity to add (positive) or remove (negative).
    * @returns An Observable of the API response.
    */
-  updateProductStock(productId: number, change: number): Observable<any> {
+  updateProductStock(productId: string, change: number): Observable<void> {
     return this.productService.updateStock(productId, change);
   }
 }

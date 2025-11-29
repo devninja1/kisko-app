@@ -78,7 +78,7 @@ export class CustomerComponent implements OnInit, AfterViewInit {
     });
   }
 
-  deleteCustomer(id: number): void {
+  deleteCustomer(id: string): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       width: '350px',
       data: { message: 'Are you sure you want to delete this customer?' }
