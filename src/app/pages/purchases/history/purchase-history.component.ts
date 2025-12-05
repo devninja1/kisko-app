@@ -7,7 +7,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { animate, state, style, transition, trigger } from '@angular/animations';
 import { combineLatest, map, Subject, takeUntil } from 'rxjs';
 
 import { Purchase } from '../../../model/purchase.model';
@@ -35,17 +34,10 @@ export interface PurchaseHistoryView extends Purchase {
   ],
   templateUrl: './purchase-history.component.html',
   styleUrls: ['./purchase-history.component.scss'],
-  animations: [
-    trigger('detailExpand', [
-      state('collapsed', style({ height: '0px', minHeight: '0' })),
-      state('expanded', style({ height: '*' })),
-      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
-    ]),
-  ],
 })
 export class PurchaseHistoryComponent implements OnInit, AfterViewInit, OnDestroy {
-  displayedColumns: string[] = ['date', 'supplierName', 'grandTotal'];
-  dataSource: MatTableDataSource<PurchaseHistoryView>;
+  columnsToDisplay: string[] = ['date', 'supplierName', 'grandTotal'];
+  dataSource = new MatTableDataSource<PurchaseHistoryView>([]);
   expandedElement: PurchaseHistoryView | null = null;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -56,22 +48,20 @@ export class PurchaseHistoryComponent implements OnInit, AfterViewInit, OnDestro
     private purchaseService: PurchaseService,
     private supplierService: SupplierService
   ) {
-    this.dataSource = new MatTableDataSource<PurchaseHistoryView>([]);
   }
 
   ngOnInit(): void {
     combineLatest([
       this.purchaseService.getPurchases(),
       this.supplierService.getSuppliers()
-    ]).pipe(
-      map(([purchases, suppliers]) => {
-        return purchases.map(p => ({
+    ]).pipe(takeUntil(this.destroy$))
+    .subscribe(([purchases, suppliers]) => {
+      const purchaseHistory = purchases.map(p => {
+        return {
           ...p,
-          supplierName: p.supplier?.name ?? 'N/A' // Directly access the name from the nested supplier object
-        }) as PurchaseHistoryView);
-      }),
-      takeUntil(this.destroy$)
-    ).subscribe(purchaseHistory => {
+          supplierName: p.supplier?.name ?? 'N/A'
+        } as PurchaseHistoryView;
+      });
       this.dataSource.data = purchaseHistory;
     });
   }
