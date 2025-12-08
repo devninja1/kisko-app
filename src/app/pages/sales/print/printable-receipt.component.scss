@@ -1,0 +1,21 @@
+body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; }
+.receipt-container { width: 320px; margin: 0 auto; padding: 20px; }
+.header { text-align: center; margin-bottom: 20px; }
+.header h2 { margin: 0; }
+.header p { margin: 2px 0; font-size: 12px; }
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  th, td {
+    padding: 6px;
+    text-align: left;
+    border-bottom: 1px dashed #ccc;
+  }
+  th { font-weight: 600; }
+  .text-right { text-align: right; }
+}
+.totals { margin-top: 20px; }
+.totals .total-row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; }
+.totals .grand-total { font-weight: bold; font-size: 16px; border-top: 1px solid #333; margin-top: 5px; }
+.footer { text-align: center; margin-top: 20px; font-size: 10px; }

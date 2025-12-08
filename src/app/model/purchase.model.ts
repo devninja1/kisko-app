@@ -2,6 +2,12 @@ import { Product } from './product.model';
 import { Supplier } from './supplier.model';
 import { Timestamp } from '@angular/fire/firestore';
 
+export interface Payment {
+  id: string;
+  date: Timestamp;
+  amount: number;
+}
+
 export interface PurchaseItem {
   product: Product;
   quantity: number;
@@ -17,6 +23,10 @@ export interface Purchase {
   items: PurchaseItem[];
   grandTotal: number;
   date: Timestamp;
+  subTotal: number;
+  tax: number;
+  amountPaid?: number;
+  payments?: Payment[];
 }
 
 export interface PurchaseToSave {
@@ -24,4 +34,8 @@ export interface PurchaseToSave {
   items: PurchaseItem[];
   grandTotal: number;
   date: Date;
+  subTotal: number;
+  tax: number;
+  amountPaid?: number;
+  // payments will be added via updates, not on initial save
 }

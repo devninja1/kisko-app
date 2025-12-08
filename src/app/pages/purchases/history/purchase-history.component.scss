@@ -1,3 +1,7 @@
+.warn {
+  color: #f44336; /* Material Design warn color */
+}
+
 .container {
   padding: 24px;
 }
@@ -25,6 +29,7 @@ tr.element-row:not(.expanded-row):active {
 .element-detail {
   overflow: hidden;
   display: flex;
+  gap: 24px;
   flex-direction: column;
   background-color: #fafafa;
 }
@@ -60,6 +65,11 @@ tr.element-row:not(.expanded-row):active {
 .item-list td:nth-child(2),
 .item-list td:nth-child(3),
 .item-list td:nth-child(4) {
+  /* This rule is for the items table, not the payment table */
+  text-align: right;
+}
+
+.align-right {
   text-align: right;
 }
 
@@ -75,4 +85,58 @@ tr.element-row:not(.expanded-row):active {
   align-items: flex-end;
   gap: 8px;
   font-size: 14px;
+}
+
+.total-divider {
+  height: 1px;
+  width: 100%;
+  background-color: #e0e0e0;
+}
+
+::ng-deep .success-snackbar {
+  --mdc-snackbar-container-color: #4caf50; // Green for success
+  --mat-mdc-snack-bar-button-color: #fff;
+}
+
+.mark-paid-btn {
+  margin-left: 8px;
+}
+
+.print-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
+
+/* Print-specific styles */
+@media print {
+  /* Hide everything on the page by default */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Make the expanded detail view and its children visible */
+  .element-detail, .element-detail * {
+    visibility: visible;
+  }
+
+  /* Position the receipt at the top-left of the print page */
+  .element-detail {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background-color: #fff; /* Ensure white background for printing */
+    box-shadow: none;
+  }
+
+  /* Hide elements that should not be on the receipt */
+  .no-print, .no-print * {
+    display: none !important;
+  }
+
+  /* Remove borders and shadows for a cleaner look */
+  .mat-elevation-z8 {
+    box-shadow: none;
+  }
 }

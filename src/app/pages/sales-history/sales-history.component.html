@@ -10,88 +10,157 @@
         <input matStartDate formControlName="start" placeholder="Start date">
         <input matEndDate formControlName="end" placeholder="End date">
       </mat-date-range-input>
-      <button mat-icon-button matSuffix *ngIf="range.value.start && range.value.end" (click)="clearDateFilter()" matTooltip="Clear date range">
-        <mat-icon>clear</mat-icon>
-      </button>
+      @if (range.value.start && range.value.end) {
+        <button mat-icon-button matSuffix (click)="clearDateFilter()" matTooltip="Clear date range">
+          <mat-icon>clear</mat-icon>
+        </button>
+      }
       <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-date-range-picker #picker></mat-date-range-picker>
     </mat-form-field>
   </div>
 
-  <div class="mat-elevation-z8">
-    <table mat-table [dataSource]="dataSource" multiTemplateDataRows>
+  <div class="table-container mat-elevation-z8">
+    @if (isLoading) {
+      <div class="loading-shade">
+        <mat-spinner></mat-spinner>
+      </div>
+    }
+    @if (!isLoading) {
+      <table mat-table [dataSource]="dataSource" multiTemplateDataRows class="mat-elevation-z2">
 
-      <!-- Expand Column -->
-      <ng-container matColumnDef="expand">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let element">
-          <button mat-icon-button (click)="$event.stopPropagation(); expandedElement = expandedElement === element ? null : element">
-            <mat-icon>{{expandedElement === element ? 'expand_less' : 'expand_more'}}</mat-icon>
-          </button>
-        </td>
-      </ng-container>
+        <!-- Expand Column -->
+        <ng-container matColumnDef="expand">
+          <th mat-header-cell *matHeaderCellDef>..</th>
+          <td mat-cell *matCellDef="let element ; let row = rowIndex">
+            <button mat-icon-button (click)="toggleRow(element.invoiceId); $event.stopPropagation()">
+              <mat-icon>{{expandedId() === element.invoiceId ? 'expand_less' : 'expand_more'}}</mat-icon>
+            </button>
+          </td>
+        </ng-container>
 
-      <!-- ID Column -->
-      <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef> Sale ID </th>
-        <td mat-cell *matCellDef="let element"> #{{element.id}} </td>
-      </ng-container>
+        <!-- ID Column -->
+        <ng-container matColumnDef="invoiceId">
+          <th mat-header-cell *matHeaderCellDef> Sale ID </th>
+          <td mat-cell *matCellDef="let element"> #{{element.invoiceId}} </td>
+        </ng-container>
 
-      <!-- Customer Column -->
-      <ng-container matColumnDef="customer">
-        <th mat-header-cell *matHeaderCellDef> Customer </th>
-        <td mat-cell *matCellDef="let element"> {{element.customerName}} </td>
-      </ng-container>
+        <!-- Customer Column -->
+        <ng-container matColumnDef="customer">
+          <th mat-header-cell *matHeaderCellDef> Customer </th>
+          <td mat-cell *matCellDef="let element"> {{element.customerName}} </td>
+        </ng-container>
 
-      <!-- Date Column -->
-      <ng-container matColumnDef="date">
-        <th mat-header-cell *matHeaderCellDef> Date </th>
-        <td mat-cell *matCellDef="let element"> {{element.date | date:'short'}} </td>
-      </ng-container>
+        <!-- Date Column -->
+        <ng-container matColumnDef="date">
+          <th mat-header-cell *matHeaderCellDef> Date </th>
+          <td mat-cell *matCellDef="let element"> {{element.date.toDate() | date:'short'}} </td>
+        </ng-container>
 
-      <!-- Grand Total Column -->
-      <ng-container matColumnDef="grandTotal">
-        <th mat-header-cell *matHeaderCellDef> Total </th>
-        <td mat-cell *matCellDef="let element"> {{element.grandTotal | currency:'INR':'symbol'}} </td>
-      </ng-container>
+        <!-- Grand Total Column -->
+        <ng-container matColumnDef="grandTotal">
+          <th mat-header-cell *matHeaderCellDef> Total </th>
+          <td mat-cell *matCellDef="let element"> {{element.grandTotal | currency:'INR':'symbol'}} </td>
+        </ng-container>
 
-      <!-- Actions Column -->
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell *matCellDef="let element">
-          <button mat-icon-button color="primary" matTooltip="Print Receipt" (click)="printReceipt(element); $event.stopPropagation()">
-            <mat-icon>print</mat-icon>
-          </button>
-        </td>
-      </ng-container>
+        <!-- Amount Paid Column -->
+        <ng-container matColumnDef="amountPaid">
+          <th mat-header-cell *matHeaderCellDef> Amount Paid </th>
+          <td mat-cell *matCellDef="let element"> {{element.amountPaid | currency:'INR':'symbol'}} </td>
+        </ng-container>
 
-      <!-- Expanded Content Column -->
-      <ng-container matColumnDef="expandedDetail">
-        <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplay.length">
-          <div class="sale-detail" [@detailExpand]="element == expandedElement ? 'expanded' : 'collapsed'">
-            <h4>Sale Details</h4>
-            <ul>
-              <li *ngFor="let item of element.items; trackBy: trackByProduct">
-                {{ item.product.name }} ({{ item.quantity }} x {{ item.product.unit_price | currency:'INR':'symbol' }}) = <strong>{{ item.total | currency:'INR':'symbol' }}</strong>
-              </li>
-            </ul>
-          </div>
-        </td>
-      </ng-container>
+        <!-- Balance Column -->
+        <ng-container matColumnDef="balance">
+          <th mat-header-cell *matHeaderCellDef> Balance </th>
+          <td mat-cell *matCellDef="let element" [class.warn]="element.balance > 0">
+            {{element.balance | currency:'INR':'symbol'}}
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
-      <tr mat-row *matRowDef="let element; columns: columnsToDisplay;"
-          class="sale-row"
-          [class.expanded-row]="expandedElement === element"
-          (click)="expandedElement = expandedElement === element ? null : element">
-      </tr>
-      <tr mat-row *matRowDef="let row; columns: ['expandedDetail']" class="detail-row"></tr>
-    </table>
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-icon-button color="primary" matTooltip="Print Receipt" (click)="printReceipt(element); $event.stopPropagation()">
+              <mat-icon>print</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" matTooltip="Delete Sale" (click)="deleteSale(element); $event.stopPropagation()">
+              <mat-icon>delete_forever</mat-icon>
+            </button>
+            @if (element.balance > 0) {
+              <button mat-stroked-button class="payment-btn" color="primary" (click)="addPayment(element); $event.stopPropagation()">
+                Add Payment
+              </button>
+            }
+          </td>
+        </ng-container>
 
-    <mat-paginator [pageSizeOptions]="[10, 25, 100]"
-                   showFirstLastButtons
-                   aria-label="Select page of sales history">
-    </mat-paginator>
+        <!-- Expanded Content Column -->
+        <ng-container matColumnDef="expandedDetail">
+          <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplay.length">
+            <div class="sale-detail"  [id]="'receipt-' + element.id">
+              @if (element.items?.length) {
+                <h4>Sale Details</h4>
+                <ul>
+                  @for (item of element.items; track trackByProduct($index, item)) {
+                    <li>
+                      {{ item.product.name }} ({{ item.quantity }} x {{ item.product.unit_price | currency:'INR':'symbol' }}) = <strong>{{ item.total | currency:'INR':'symbol' }}</strong>
+                    </li>
+                  }
+                </ul>
+              }
+
+              @if (element.payments?.length) {
+                <div class="payment-history">
+                  <h4>Payment History</h4>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th class="align-right no-print">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @for (payment of element.payments; track payment.id) {
+                        <tr>
+                          <td>{{ payment.date.toDate() | date:'medium' }}</td>
+                          <td>{{ payment.amount | currency:'INR':'symbol' }}</td>
+                          <td class="align-right no-print">
+                            <button mat-icon-button (click)="editPayment(element, payment); $event.stopPropagation()"><mat-icon>edit</mat-icon></button>
+                            <button mat-icon-button color="warn" (click)="deletePayment(element, payment); $event.stopPropagation()"><mat-icon>delete</mat-icon></button>
+                          </td>
+                        </tr>
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              }
+
+              <div class="totals">
+                <div><strong>Total:</strong> {{ element.grandTotal | currency:'INR':'symbol' }}</div>
+                <div><strong>Paid:</strong> {{ element.amountPaid | currency:'INR':'symbol' }}</div>
+                @if (element.balance > 0) {
+                  <div><strong>Balance Due:</strong> {{ element.balance | currency:'INR':'symbol' }}</div>
+                }
+              </div>
+            </div>
+          </td>
+        </ng-container>
+
+      <!-- Header Column -->
+        <tr mat-header-row *matHeaderRowDef="columnsToDisplay"></tr>
+        <tr mat-row *matRowDef="let element; columns: columnsToDisplay;"
+            class="sale-row"            
+            (click)="toggleRow(element.invoiceId)" [style.cursor]="'pointer'">
+        </tr>
+        <tr mat-row *matRowDef="let element; columns: ['expandedDetail']" [class.detail-row]="expandedId() != element.invoiceId"></tr>
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[10, 25, 100]"
+                     showFirstLastButtons
+                     aria-label="Select page of sales history">
+      </mat-paginator>
+    }
   </div>
 </div>
-

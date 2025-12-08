@@ -13,12 +13,8 @@ export class ProductService {
   // Default products to populate Firestore if it's empty.
   // Note: Firestore will generate string IDs, so we don't need to provide them.
   private defaultProducts: Omit<Product, 'id'>[] = [
-    { name: 'Laptop Pro', category: 'Electronics', description: 'A powerful laptop for professionals', unit_price: 1200, cost_price: 950, stock: 10, is_active: true },
-    { name: 'Wireless Mouse', category: 'Accessories', description: 'Ergonomic wireless mouse', unit_price: 25, cost_price: 15, stock: 50, is_active: true },
-    { name: 'Mechanical Keyboard', category: 'Accessories', description: 'RGB Mechanical Keyboard', unit_price: 95, cost_price: 60, stock: 25, is_active: false },
-    { name: '4K Monitor', category: 'Electronics', description: '27-inch 4K UHD Monitor', unit_price: 450, cost_price: 350, stock: 15, is_active: true },
-    { name: 'Webcam HD', category: 'Accessories', description: '1080p HD Webcam for streaming', unit_price: 60, cost_price: 40, stock: 30, is_active: true },
-  ];
+    { name: 'HB', category: 'Bread', description: 'Hibrid Bread', unit_price: 84, cost_price: 86, stock: 10, is_active: true },
+    ];
 
   constructor() {
     this.loadInitialData();

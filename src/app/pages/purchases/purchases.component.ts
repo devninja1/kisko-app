@@ -48,6 +48,7 @@ export class PurchasesComponent implements OnInit, OnDestroy {
   addedProductNames$ = this.addedProductNamesSubject.asObservable();
 
   selectedSupplier: Supplier | null = null;
+  amountPaid: number | null = null;
 
   // Action Streams
   private saveAction$ = new Subject<void>();
@@ -81,11 +82,18 @@ export class PurchasesComponent implements OnInit, OnDestroy {
           this.snackBar.open('No items to save in purchase!', 'Close', { duration: 3000 });
           return EMPTY;
         }
-        const grandTotal = purchaseList.reduce((acc, item) => acc + item.total, 0);
+        // Calculate totals
+        const subTotal = purchaseList.reduce((acc, item) => acc + item.total, 0);
+        const tax = 0; // Assuming 0 tax for now. This could be a form field later.
+        const grandTotal = subTotal + tax;
+
         return this.purchaseService.savePurchase({
           supplier: this.selectedSupplier,
           items: purchaseList,
-          grandTotal: grandTotal,
+          subTotal,
+          tax,
+          grandTotal,
+          amountPaid: this.amountPaid ?? 0,
           date: new Date(),
         });
       }),
@@ -147,5 +155,6 @@ export class PurchasesComponent implements OnInit, OnDestroy {
     this.purchaseListSubject.next([]);
     this.addedProductNamesSubject.next(new Set());
     this.selectedSupplier = null;
+    this.amountPaid = null;
   }
 }

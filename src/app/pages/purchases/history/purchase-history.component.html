@@ -27,11 +27,41 @@
         <td mat-cell *matCellDef="let element"> {{element.grandTotal | currency:'INR'}} </td>
       </ng-container>
 
+      <!-- Amount Paid Column -->
+      <ng-container matColumnDef="amountPaid">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Amount Paid </th>
+        <td mat-cell *matCellDef="let element"> {{element.amountPaid | currency:'INR'}} </td>
+      </ng-container>
+
+      <!-- Balance Column -->
+      <ng-container matColumnDef="balance">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Balance </th>
+        <td mat-cell *matCellDef="let element" [class.warn]="element.balance > 0">
+          {{element.balance | currency:'INR'}}
+        </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-stroked-button color="primary" *ngIf="element.balance > 0" (click)="addPayment(element); $event.stopPropagation()">
+            Add Payment
+          </button>
+          <button mat-flat-button class="mark-paid-btn" color="primary" *ngIf="element.balance > 0" (click)="markAsPaid(element); $event.stopPropagation()">
+            Mark as Paid
+          </button>
+        </td>
+      </ng-container>
+
       <!-- Expanded Content Column - The detail row -->
       <ng-container matColumnDef="expandedDetail">
         <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplay.length">
           <div class="element-detail" [hidden]="element !== expandedElement">
-            <div class="detail-container">
+            <div class="detail-container" [id]="'receipt-' + element.id">
+              <button mat-icon-button class="print-button no-print" (click)="printReceipt()">
+                <mat-icon>print</mat-icon>
+              </button>
               <div class="detail-header">
                 <strong>Purchase Items</strong>
               </div>
@@ -58,9 +88,39 @@
                   </tbody>
                 </table>
               </div>
+
+              <div class="payment-history" *ngIf="element.payments && element.payments.length > 0">
+                <div class="detail-header">
+                  <strong>Payment History</strong>
+                </div>
+                <div class="item-list">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Date</th>
+                        <th>Amount</th>
+                        <th class="align-right no-print">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let payment of element.payments">
+                        <td>{{ payment.date.toDate() | date:'medium' }}</td>
+                        <td>{{ payment.amount | currency:'INR' }}</td>
+                        <td class="align-right no-print">
+                          <button mat-icon-button (click)="editPayment(element, payment); $event.stopPropagation()"><mat-icon>edit</mat-icon></button>
+                          <button mat-icon-button color="warn" (click)="deletePayment(element, payment); $event.stopPropagation()"><mat-icon>delete</mat-icon></button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
               <div class="totals">
                 <div><strong>Subtotal:</strong> {{ element.subTotal | currency:'INR' }}</div>
                 <div><strong>Tax:</strong> {{ element.tax | currency:'INR' }}</div>
+                <div class="total-divider"></div>
+                <div><strong>Amount Paid:</strong> {{ element.amountPaid | currency:'INR' }}</div>
                 <div><strong>Grand Total:</strong> {{ element.grandTotal | currency:'INR' }}</div>
               </div>
             </div>
@@ -78,7 +138,7 @@
 
       <!-- Row shown when there is no matching data. -->
       <tr class="mat-row" *matNoDataRow>
-        <td class="mat-cell" colspan="4">No data matching the filter "{{input.value}}"</td>
+        <td class="mat-cell" [attr.colspan]="columnsToDisplay.length">No data matching the filter "{{input.value}}"</td>
       </tr>
     </table>
 
