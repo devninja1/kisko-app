@@ -9,9 +9,12 @@ import { authGuard } from './core/services/auth.guard';
 import { LoginComponent } from './pages/login/login.component';
 import { RegisterComponent } from './pages/register/register.component';
 import { CustomerComponent } from './pages/customer/customer.component';
+import { SaleReceiptPageComponent } from './pages/sales/print/sale-receipt-page.component';
+
 
 
 export const routes: Routes = [
+  { path: 'printSale',  component: SaleReceiptPageComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: '', component: Dashboard, canActivate: [authGuard], },
@@ -23,5 +26,7 @@ export const routes: Routes = [
   { path: 'customers', canActivate: [authGuard], component: CustomerComponent }, // Assuming you have this component
   { path: 'saleshistory', canActivate: [authGuard], component: SalesHistoryComponent },
   { path: 'sales', canActivate: [authGuard], component: SalesComponent },
+  
+  
   { path: '**', redirectTo: '' } // Wildcard route
 ];

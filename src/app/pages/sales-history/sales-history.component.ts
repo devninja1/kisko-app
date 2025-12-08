@@ -240,7 +240,7 @@ export class SalesHistoryComponent implements OnInit, AfterViewInit {
   printReceipt(sale: Sale): void {
     // Construct the URL for the dedicated print route
     const url = this.router.serializeUrl(
-      this.router.createUrlTree(['/print/sale', sale.id])
+      this.router.createUrlTree(['/printSale'], { queryParams: { id: sale.id } })
     );
 
     // Open the URL in a new tab. The SaleReceiptPageComponent will handle the printing.
