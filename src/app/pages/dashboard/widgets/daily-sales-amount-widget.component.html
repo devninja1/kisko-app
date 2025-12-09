@@ -3,14 +3,14 @@
   <mat-card-content>
     @if (dailySalesAmount.length > 0) {
       <div class="chart-container">
-        <ngx-charts-pie-chart
+        <!-- <ngx-charts-pie-chart
           [results]="dailySalesAmount"
           [legend]="true"
           [labels]="true"
           [doughnut]="false"
           [legendPosition]="legendPosition"
           [tooltipText]="tooltipText">
-        </ngx-charts-pie-chart>
+        </ngx-charts-pie-chart> -->
       </div>
     } @else {
       <div class="no-sales-message">
