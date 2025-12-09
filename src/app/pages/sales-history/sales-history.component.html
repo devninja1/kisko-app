@@ -97,14 +97,14 @@
 
         <!-- Expanded Content Column -->
         <ng-container matColumnDef="expandedDetail">
-          <td mat-cell *matCellDef="let element" [attr.colspan]="columnsToDisplay.length">
+          <td mat-cell *matCellDef="let element as SalesItem" [attr.colspan]="columnsToDisplay.length">
             <div class="sale-detail"  [id]="'receipt-' + element.id">
               @if (element.items?.length) {
                 <h4>Sale Details</h4>
                 <ul>
                   @for (item of element.items; track trackByProduct($index, item)) {
                     <li>
-                      {{ item.product.name }} ({{ item.quantity }} x {{ item.product.unit_price | currency:'INR':'symbol' }}) = <strong>{{ item.total | currency:'INR':'symbol' }}</strong>
+                      {{ item.productName }} ({{ item.quantity }} x {{ item.unitPrice | currency:'INR':'symbol' }}) = <strong>{{ item.total | currency:'INR':'symbol' }}</strong>
                     </li>
                   }
                 </ul>

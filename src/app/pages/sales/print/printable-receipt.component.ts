@@ -24,11 +24,11 @@ import { Sale } from '../../../model/sale.model';
           </tr>
         </thead>
         <tbody>
-          @for (item of sale.items; track item.product.id) {
+          @for (item of sale.items; track item.productId) {
             <tr>
-              <td>{{ item.product.name }}</td>
+              <td>{{ item.productName }}</td>
               <td class="text-right">{{ item.quantity }}</td>
-              <td class="text-right">{{ item.product.unit_price | currency }}</td>
+              <td class="text-right">{{ item.unitPrice | currency }}</td>
               <td class="text-right">{{ item.total | currency }}</td>
             </tr>
           }

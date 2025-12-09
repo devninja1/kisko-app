@@ -25,8 +25,8 @@ export class SalesListComponent {
   }
 
   trackByProduct(index: number, item: SalesItem): string {
-    // Create a unique identifier for each row for better *ngFor performance
-    return `${item.product.name}-${index}`;
+    // Create a unique identifier for each row for better @for performance
+    return `${item.productId}-${index}`;
   }
 
   deleteItem(index: number): void {

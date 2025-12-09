@@ -11,8 +11,8 @@
       </div>
       @for (item of salesList; track trackByProduct(i, item); let i = $index) {
         <div class="sales-list-item added-item">
-          <span class="col-product">{{ item.product.name }}</span>
-          <span class="col-rate">{{ item.product.unit_price | currency:'INR':'symbol' }}</span>
+          <span class="col-product">{{ item.productName }}</span>
+          <span class="col-rate">{{ item.unitPrice | currency:'INR':'symbol' }}</span>
           <span class="col-qty">{{ item.quantity }}</span>
           <span class="col-total">{{ item.total | currency:'INR':'symbol' }}</span>
           <span class="col-actions">

@@ -81,15 +81,20 @@ export class InventoryService {
     // Process sales for outflow
     for (const sale of filteredSales) {
       for (const item of sale.items) {
+        // Find the full product details using the productId from the sale item.
+        const product = allProducts.find(p => p.id === item.productId);
+        if (!product) continue; // Skip if product not found, or handle error
+
         outflowItems.push({
-          product: item.product,
+          product: product,
           quantity: item.quantity,
           outflow_date: sale.date.toDate(),
           reason: 'Sale'
         });
-        const metrics = productMetricsMap.get(item.product.id.toString()) || { sold: 0, added: 0, adjusted: 0 };
+
+        const metrics = productMetricsMap.get(product.id.toString()) || { sold: 0, added: 0, adjusted: 0 };
         metrics.sold += item.quantity;
-        productMetricsMap.set(item.product.id.toString(), metrics);
+        productMetricsMap.set(product.id.toString(), metrics);
       }
     }
 

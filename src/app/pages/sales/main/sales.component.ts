@@ -78,9 +78,9 @@ export class SalesComponent implements OnInit {
 
   onItemAdded(newItem: SalesItem) {
     // Decrease stock from the master product list
-    this.productService.updateStock(newItem.product.id.toString(), -newItem.quantity).subscribe();
+    this.productService.updateStock(newItem.productId.toString(), -newItem.quantity).subscribe();
     const existingItemIndex = this.salesList.findIndex(
-      (saleItem) => saleItem.product.name === newItem.product.name
+      (saleItem) => saleItem.productId === newItem.productId
     );
 
     if(existingItemIndex > -1) {
@@ -90,14 +90,14 @@ export class SalesComponent implements OnInit {
 
       // Update quantity, rate, and total
       existingItem.quantity += newItem.quantity;
-      existingItem.product.unit_price = newItem.product.unit_price; // Use the latest rate
-      existingItem.total = existingItem.product.unit_price * existingItem.quantity;
+      existingItem.unitPrice = newItem.unitPrice; // Use the latest rate
+      existingItem.total = existingItem.unitPrice * existingItem.quantity;
 
       this.salesList = updatedSalesList;
     } else {
       // Product is new, add it to the list
       this.salesList = [...this.salesList, newItem];
-      this.addedProductNames.add(newItem.product.name);
+      this.addedProductNames.add(newItem.productName);
     }
   }
 
@@ -134,9 +134,9 @@ export class SalesComponent implements OnInit {
   onItemDeleted(index: number) {
     const deletedItem = this.salesList[index];
     if (deletedItem) {
-      this.productService.updateStock(deletedItem.product.id.toString(), deletedItem.quantity).subscribe();
+      this.productService.updateStock(deletedItem.productId.toString(), deletedItem.quantity).subscribe();
 
-      this.addedProductNames.delete(deletedItem.product.name);
+      this.addedProductNames.delete(deletedItem.productName);
       // Create a new array to ensure change detection is triggered
       this.salesList = this.salesList.filter((_, i: number) => i !== index);
     }

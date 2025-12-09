@@ -90,10 +90,9 @@ export class SalesEntryComponent implements OnInit {
     }
 
     this.itemAdded.emit({
-      product: {
-        ...this.selectedProduct,
-        unit_price: this.editableRate,
-      },
+      productId: this.selectedProduct.id,
+      productName: this.selectedProduct.name,
+      unitPrice: this.editableRate,
       quantity: this.quantity,
       total: this.totalAmount,
     });

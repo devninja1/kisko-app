@@ -251,7 +251,7 @@ export class SalesHistoryComponent implements OnInit, AfterViewInit {
   }
 
   trackByProduct(index: number, item: SalesItem): string {
-    return item.product.id.toString();
+    return item.productId.toString();
   }
 
    toggleRow(rowId: number) {
