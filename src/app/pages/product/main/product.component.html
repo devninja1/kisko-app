@@ -5,6 +5,25 @@
       <mat-icon>add</mat-icon>
       <span>Create Product</span>
     </button>
+    
+    <button mat-flat-button color="primary" (click)="exportAllProducts()">
+      <mat-icon>download</mat-icon>
+      Export All
+    </button>
+
+    <button mat-flat-button color="primary" (click)="csvInput.click()" [disabled]="isImporting">
+      @if (isImporting) {
+        <ng-container>
+          <mat-icon>hourglass_top</mat-icon> <span>Importing...</span>
+        </ng-container>
+      } @else {
+        <ng-container>
+          <mat-icon>upload</mat-icon> <span>Import CSV</span>
+        </ng-container>
+      }
+    </button>
+    <input hidden type="file" #csvInput (change)="onFileSelected($event)" accept=".csv" />
+
   </div>
 
   <div class="filter-controls">
@@ -18,7 +37,7 @@
       <mat-select [formControl]="categoryFilter">
         <mat-option value="">All Categories</mat-option>
         @for (category of uniqueCategories; track category) {
-          <mat-option [value]="category">{{ category }}</mat-option>
+        <mat-option [value]="category">{{ category }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
@@ -62,7 +81,8 @@
       <ng-container matColumnDef="profit_margin">
         <th mat-header-cell *matHeaderCellDef mat-sort-header> Profit Margin </th>
         <td mat-cell *matCellDef="let product">
-          {{ (product.unit_price > 0 ? ((product.unit_price - product.cost_price) / product.unit_price) : 0) | percent:'1.2-2' }}
+          {{ (product.unit_price > 0 ? ((product.unit_price - product.cost_price) / product.unit_price) : 0) |
+          percent:'1.2-2' }}
         </td>
       </ng-container>
 
@@ -76,7 +96,8 @@
       <ng-container matColumnDef="is_active">
         <th mat-header-cell *matHeaderCellDef> Active </th>
         <td mat-cell *matCellDef="let product">
-          <mat-icon [color]="product.is_active ? 'primary' : 'warn'">{{ product.is_active ? 'check_circle' : 'cancel' }}</mat-icon>
+          <mat-icon [color]="product.is_active ? 'primary' : 'warn'">{{ product.is_active ? 'check_circle' : 'cancel'
+            }}</mat-icon>
         </td>
       </ng-container>
 
@@ -97,9 +118,7 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]"
-      showFirstLastButtons
-      aria-label="Select page of periodic elements">
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Select page of periodic elements">
     </mat-paginator>
   </div>
 </div>
