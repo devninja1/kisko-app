@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,13 +12,12 @@ import { Supplier } from '../../model/supplier.model';
   selector: 'app-supplier-dialog',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
-    MatButtonModule,
-  ],
+    MatButtonModule
+],
   templateUrl: './supplier-dialog.component.html',
   styleUrl: './supplier-dialog.component.scss'
 })

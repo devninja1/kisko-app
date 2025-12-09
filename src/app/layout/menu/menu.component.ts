@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,7 +9,7 @@ import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-menu',
   standalone: true,
-  imports: [CommonModule, MatListModule, MatIconModule, RouterLink, RouterLinkActive, MatTooltipModule],
+  imports: [MatListModule, MatIconModule, RouterLink, RouterLinkActive, MatTooltipModule],
   templateUrl: './menu.component.html',
   styleUrl: './menu.component.scss'
 })

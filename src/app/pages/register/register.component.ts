@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -13,14 +13,13 @@ import { AuthService } from '../../core/services/auth.service';
   selector: 'app-register',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     RouterModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule
-  ],
+],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })

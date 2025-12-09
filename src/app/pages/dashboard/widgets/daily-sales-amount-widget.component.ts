@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { CurrencyPipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { SalesService } from '../../../core/services/sales.service';
@@ -14,7 +14,7 @@ interface ChartData {
 @Component({
   selector: 'app-daily-sales-amount-widget',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule, NgxChartsModule],
+  imports: [MatCardModule, MatIconModule, NgxChartsModule],
   providers: [CurrencyPipe], // Make CurrencyPipe available for injection
   templateUrl: './daily-sales-amount-widget.component.html',
   styleUrl: './daily-sales-amount-widget.component.scss'

@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -20,7 +20,6 @@ import { ConfirmationDialogComponent } from '../../shared/components/confirmatio
   selector: 'app-supplier-management',
   standalone: true,
   imports: [
-    CommonModule,
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
@@ -29,8 +28,8 @@ import { ConfirmationDialogComponent } from '../../shared/components/confirmatio
     MatFormFieldModule,
     MatInputModule,
     MatDialogModule,
-    MatSnackBarModule,
-  ],
+    MatSnackBarModule
+],
   templateUrl: './supplier-management.component.html',
   styleUrl: './supplier-management.component.scss'
 })
