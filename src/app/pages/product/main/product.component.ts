@@ -38,9 +38,9 @@ import { MatPaginator } from '@angular/material/paginator';
   styleUrl: './product.component.scss'
 })
 export class ProductComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['name', 'category', 'description', 'cost_price', 'unit_price', 'profit_margin', 'stock', 'is_active', 'actions'];
+  displayedColumns: string[] = [ 'product_code', 'name', 'category', 'description', 'cost_price', 'unit_price', 'profit_margin', 'stock', 'is_active', 'date_added', 'date_modified', 'actions'];
   dataSource: MatTableDataSource<Product>;
-  
+
   categoryFilter = new FormControl('');
   uniqueCategories: string[] = [];
   private filterValues = { global: '', category: '' };

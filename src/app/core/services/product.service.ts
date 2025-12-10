@@ -13,11 +13,11 @@ export class ProductService {
   private isOnline = navigator.onLine;
   private products$ = new BehaviorSubject<Product[]>([]);
   private defaultProducts: Product[] = [
-    { id: 1, name: 'Laptop Pro', category: 'Electronics', description: 'A powerful laptop for professionals', unit_price: 1200, cost_price: 950, stock: 10, is_active: true },
-    { id: 2, name: 'Wireless Mouse', category: 'Accessories', description: 'Ergonomic wireless mouse', unit_price: 25, cost_price: 15, stock: 50, is_active: true },
-    { id: 3, name: 'Mechanical Keyboard', category: 'Accessories', description: 'RGB Mechanical Keyboard', unit_price: 95, cost_price: 60, stock: 25, is_active: false },
-    { id: 4, name: '4K Monitor', category: 'Electronics', description: '27-inch 4K UHD Monitor', unit_price: 450, cost_price: 350, stock: 15, is_active: true },
-    { id: 5, name: 'Webcam HD', category: 'Accessories', description: '1080p HD Webcam for streaming', unit_price: 60, cost_price: 40, stock: 30, is_active: true },
+    { id: 1, product_code: 1001, name: 'Slice', category: 'Bread', description: 'A slice of bread', unit_price: 27, cost_price: 26, stock: 10, is_active: true, date_added: new Date(), date_modified: new Date(), user_added: 'system', user_modified: 'system' },
+    { id: 2, product_code: 1002, name: 'HB', category: 'Bread', description: ' hybride quater', unit_price: 86, cost_price: 80, stock: 50, is_active: true, date_added: new Date(), date_modified: new Date(), user_added: 'system', user_modified: 'system' },
+    { id: 3, product_code: 1003, name: 'Half', category: 'Bread', description: 'Half loaf of bread', unit_price: 27, cost_price: 26, stock: 25, is_active: false, date_added: new Date(), date_modified: new Date(), user_added: 'system', user_modified: 'system' },
+    { id: 4, product_code: 1004, name: 'Rolla', category: 'Bread', description: 'rolla bread', unit_price: 27, cost_price: 26, stock: 15, is_active: true, date_added: new Date(), date_modified: new Date(), user_added: 'system', user_modified: 'system' },
+    { id: 5, product_code: 1005, name: 'CD', category: 'Bread', description: 'CD bread', unit_price: 80, cost_price: 78, stock: 30, is_active: true, date_added: new Date(), date_modified: new Date(), user_added: 'system', user_modified: 'system' },
   ];
 
   constructor(
@@ -65,28 +65,40 @@ export class ProductService {
     return this.products$.asObservable();
   }
 
-  addProduct(productData: Omit<Product, 'id'>): Observable<Product> {
-    // Optimistic update: add to local DB immediately with a temporary ID
-    const tempId = -Date.now();
-    const tempProduct: Product = {
-      ...productData,
-      id: tempId,
-      cost_price: productData.cost_price || 0,
-      stock: productData.stock || 0,
-      is_active: productData.is_active ?? true,
-      description: productData.description || '',
-      unit_price: productData.unit_price || 0,
-      category: productData.category || '',
-      name: productData.name || '',
-    };
-
-    return from(this.dbService.add<Product>('products', tempProduct)).pipe(
-      tap(() => {
-        const currentProducts = this.products$.getValue();
-        this.products$.next([...currentProducts, tempProduct]);
-        this.syncService.addToQueue({ url: this.apiUrl, method: 'POST', payload: { ...productData, tempId } });
-      }),
-      map(() => tempProduct)
+  addProduct(productData: Omit<Product, 'id' | 'product_code'>): Observable<Product> {
+    // Get all products to determine the next product_code
+    return from(this.dbService.getAll<Product>('products')).pipe(
+      switchMap((products) => {
+        const maxProductCode = products.length > 0
+          ? Math.max(...products.map(p => p.product_code || 1000))
+          : 1000;
+        const nextProductCode = maxProductCode + 1;
+        const tempId = -Date.now();
+        const tempProduct: Product = {
+          ...productData,
+          id: tempId,
+          product_code: nextProductCode,
+          cost_price: productData.cost_price || 0,
+          stock: productData.stock || 0,
+          is_active: productData.is_active ?? true,
+          description: productData.description || '',
+          unit_price: productData.unit_price || 0,
+          category: productData.category || '',
+          name: productData.name || '',
+          date_added: new Date(),
+          date_modified: new Date(),
+          user_added: productData.user_added || 'system',
+          user_modified: productData.user_modified || 'system'
+        };
+        return from(this.dbService.add<Product>('products', tempProduct)).pipe(
+          tap(() => {
+            const currentProducts = this.products$.getValue();
+            this.products$.next([...currentProducts, tempProduct]);
+            this.syncService.addToQueue({ url: this.apiUrl, method: 'POST', payload: { ...productData, tempId, product_code: nextProductCode } });
+          }),
+          map(() => tempProduct)
+        );
+      })
     );
   }
 
