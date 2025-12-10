@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { SalesService } from '../../../core/services/sales.service';
 import { Sale } from '../../../model/sale.model';
-import { NgxChartsModule } from '@swimlane/ngx-charts';
+// import { NgxChartsModule } from '@swimlane/ngx-charts';
 
 interface ChartData {
   name: string;
@@ -15,7 +15,8 @@ interface ChartData {
   selector: 'app-daily-sales-widget',
   standalone: true,
   // Note: You will need to run 'npm install @swimlane/ngx-charts'
-  imports: [CommonModule, MatCardModule, MatIconModule,  NgxChartsModule],
+  // imports: [CommonModule, MatCardModule, MatIconModule,  NgxChartsModule],
+    imports: [CommonModule, MatCardModule, MatIconModule],
   templateUrl: './daily-sales-widget.component.html',
   styleUrl: './daily-sales-widget.component.scss'
 })

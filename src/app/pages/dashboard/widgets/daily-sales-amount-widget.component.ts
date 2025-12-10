@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { SalesService } from '../../../core/services/sales.service';
 import { Sale } from '../../../model/sale.model';
-import { NgxChartsModule, LegendPosition } from '@swimlane/ngx-charts';
+// import { NgxChartsModule, LegendPosition } from '@swimlane/ngx-charts';
 
 interface ChartData {
   name: string;
@@ -14,14 +14,15 @@ interface ChartData {
 @Component({
   selector: 'app-daily-sales-amount-widget',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule, NgxChartsModule],
+  // imports: [CommonModule, MatCardModule, MatIconModule, NgxChartsModule],
+    imports: [CommonModule, MatCardModule, MatIconModule],
   providers: [CurrencyPipe], // Make CurrencyPipe available for injection
   templateUrl: './daily-sales-amount-widget.component.html',
   styleUrl: './daily-sales-amount-widget.component.scss'
 })
 export class DailySalesAmountWidgetComponent implements OnInit {
   dailySalesAmount: ChartData[] = [];
-  legendPosition: LegendPosition = LegendPosition.Below;
+  // legendPosition: LegendPosition = LegendPosition.Below;
 
   constructor(
     private salesService: SalesService,
