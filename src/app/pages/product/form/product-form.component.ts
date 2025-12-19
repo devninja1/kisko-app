@@ -41,6 +41,7 @@ export class ProductFormComponent {
       cost_price: [product?.cost_price || 0, [Validators.required, Validators.min(0)]],
       unit_price: [product?.unit_price || 0, [Validators.required, Validators.min(0)]],
       stock: [product?.stock || 0, [Validators.required, Validators.min(0)]],
+      is_Stock_enable: [product?.is_Stock_enable ?? true],
       is_active: [product?.is_active ?? true],
     });
   }

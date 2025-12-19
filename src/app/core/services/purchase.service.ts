@@ -5,12 +5,13 @@ import { NgxIndexedDBService } from 'ngx-indexed-db';
 import { Purchase } from '../../model/purchase.model';
 import { SyncService } from './sync.service';
 import { ProductService } from './product.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PurchaseService {
-  private apiUrl = 'http://localhost:3000/api/purchases';
+  private apiUrl = `${environment.apiUrl}/purchases`;
   private isOnline = navigator.onLine;
   private purchases$ = new BehaviorSubject<Purchase[]>([]);
 

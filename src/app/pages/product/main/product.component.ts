@@ -38,7 +38,7 @@ import { MatPaginator } from '@angular/material/paginator';
   styleUrl: './product.component.scss'
 })
 export class ProductComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = [ 'product_code', 'name', 'category', 'description', 'cost_price', 'unit_price', 'profit_margin', 'stock', 'is_active', 'date_added', 'date_modified', 'actions'];
+  displayedColumns: string[] = ['product_code', 'name', 'category', 'description', 'cost_price', 'unit_price', 'profit_margin', 'stock', 'is_Stock_enable', 'is_active', 'actions'];
   dataSource: MatTableDataSource<Product>;
 
   categoryFilter = new FormControl('');
@@ -57,11 +57,8 @@ export class ProductComponent implements OnInit, AfterViewInit {
       this.filterValues.category = value || '';
       this.dataSource.filter = JSON.stringify(this.filterValues);
     });
-  }
 
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
+    // Setup filter predicate
     this.dataSource.filterPredicate = (data: Product, filter: string): boolean => {
       const searchTerms = JSON.parse(filter);
 
@@ -76,6 +73,7 @@ export class ProductComponent implements OnInit, AfterViewInit {
 
       return globalMatch && categoryMatch;
     };
+
     // Custom sorting for calculated 'profit_margin' column
     this.dataSource.sortingDataAccessor = (item, property) => {
       switch (property) {
@@ -90,11 +88,17 @@ export class ProductComponent implements OnInit, AfterViewInit {
     // The getProducts() returns a BehaviorSubject, so we can subscribe to it.
     // The table will update automatically whenever the service emits new data.
     this.productService.getProducts().subscribe(products => {
+      console.log('Received products page 1:', products);
       this.dataSource.data = products;
       this.uniqueCategories = [...new Set(products.map(p => p.category))].sort();
       // Re-apply the filter in case the data changed
       this.dataSource.filter = JSON.stringify(this.filterValues);
     });
+  }
+
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   applyFilter(event: Event) {

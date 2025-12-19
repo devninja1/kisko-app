@@ -4,12 +4,13 @@ import { BehaviorSubject, catchError, EMPTY, from, map, Observable, of, switchMa
 import { NgxIndexedDBService } from 'ngx-indexed-db';
 import { Supplier } from '../../model/supplier.model';
 import { SyncService } from './sync.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SupplierService {
-  private apiUrl = 'http://localhost:3000/api/suppliers';
+  private apiUrl = `${environment.apiUrl}/suppliers`;
   private isOnline = navigator.onLine;
   private suppliers$ = new BehaviorSubject<Supplier[]>([]);
   private defaultSuppliers: Supplier[] = [

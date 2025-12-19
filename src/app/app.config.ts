@@ -14,7 +14,7 @@ registerLocaleData(localeIn);
 
 const dbConfig: DBConfig = {
   name: 'KiskoAppDb',
-  version: 1,
+  version: 2,
   objectStoresMeta: [{
     store: 'products',
     storeConfig: { keyPath: 'id', autoIncrement: true },

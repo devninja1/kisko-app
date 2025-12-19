@@ -5,12 +5,13 @@ import { NgxIndexedDBService } from 'ngx-indexed-db';
 import { Sale } from '../../model/sale.model';
 import { SyncService } from './sync.service';
 import { ProductService } from './product.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SalesService {
-  private apiUrl = 'http://localhost:3000/api/sales';
+  private apiUrl = `${environment.apiUrl}/sales`;
   private isOnline = navigator.onLine;
   private sales$ = new BehaviorSubject<Sale[]>([]);
 

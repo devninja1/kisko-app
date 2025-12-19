@@ -10,14 +10,38 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Email</mat-label>
-      <input matInput type="email" formControlName="email" required>
+      <mat-label>Phone Number</mat-label>
+      <input matInput formControlName="phone_number" required>
+      @if (customerForm.get('phone_number')?.hasError('required')) {
+        <mat-error>Phone number is required</mat-error>
+      }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Phone</mat-label>
-      <input matInput formControlName="phone">
+      <mat-label>Place</mat-label>
+      <input matInput formControlName="place">
     </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Type</mat-label>
+      <mat-select formControlName="type">
+        <mat-option value="regular">Regular</mat-option>
+        <mat-option value="vip">VIP</mat-option>
+        <mat-option value="wholesale">Wholesale</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Display Order</mat-label>
+      <input matInput type="number" formControlName="display_order" min="0">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Date Added</mat-label>
+      <input matInput formControlName="date_added" readonly>
+    </mat-form-field>
+
+    <mat-checkbox formControlName="is_active">Active</mat-checkbox>
   </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">

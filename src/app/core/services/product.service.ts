@@ -4,20 +4,21 @@ import { from, Observable, of, switchMap, tap, map, BehaviorSubject, concatMap }
 import { NgxIndexedDBService, WithID } from 'ngx-indexed-db';
 import { Product } from '../../model/product.model';
 import { SyncService } from './sync.service';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
-  private apiUrl = 'http://localhost:3000/api/products';
+  private apiUrl = `${environment.apiUrl}/product`;
   private isOnline = navigator.onLine;
   private products$ = new BehaviorSubject<Product[]>([]);
   private defaultProducts: Product[] = [
-    { id: 1, product_code: 1001, name: 'Slice', category: 'Bread', description: 'A slice of bread', unit_price: 27, cost_price: 26, stock: 10, is_active: true, date_added: new Date(), date_modified: new Date(), user_added: 'system', user_modified: 'system' },
-    { id: 2, product_code: 1002, name: 'HB', category: 'Bread', description: ' hybride quater', unit_price: 86, cost_price: 80, stock: 50, is_active: true, date_added: new Date(), date_modified: new Date(), user_added: 'system', user_modified: 'system' },
-    { id: 3, product_code: 1003, name: 'Half', category: 'Bread', description: 'Half loaf of bread', unit_price: 27, cost_price: 26, stock: 25, is_active: false, date_added: new Date(), date_modified: new Date(), user_added: 'system', user_modified: 'system' },
-    { id: 4, product_code: 1004, name: 'Rolla', category: 'Bread', description: 'rolla bread', unit_price: 27, cost_price: 26, stock: 15, is_active: true, date_added: new Date(), date_modified: new Date(), user_added: 'system', user_modified: 'system' },
-    { id: 5, product_code: 1005, name: 'CD', category: 'Bread', description: 'CD bread', unit_price: 80, cost_price: 78, stock: 30, is_active: true, date_added: new Date(), date_modified: new Date(), user_added: 'system', user_modified: 'system' },
+    { id: 1, product_code: 1001, name: 'Slice', category: 'Bread', description: 'A slice of bread', unit_price: 27, cost_price: 26, stock: 10, is_Stock_enable: true, is_active: true },
+    { id: 2, product_code: 1002, name: 'HB', category: 'Bread', description: ' hybride quater', unit_price: 86, cost_price: 80, stock: 50, is_Stock_enable: true, is_active: true },
+    { id: 3, product_code: 1003, name: 'Half', category: 'Bread', description: 'Half loaf of bread', unit_price: 27, cost_price: 26, stock: 25, is_Stock_enable: true, is_active: false },
+    { id: 4, product_code: 1004, name: 'Rolla', category: 'Bread', description: 'rolla bread', unit_price: 27, cost_price: 26, stock: 15, is_Stock_enable: true, is_active: true },
+    { id: 5, product_code: 1005, name: 'CD', category: 'Bread', description: 'CD bread', unit_price: 80, cost_price: 78, stock: 30, is_Stock_enable: true, is_active: true },
   ];
 
   constructor(
@@ -66,7 +67,6 @@ export class ProductService {
   }
 
   addProduct(productData: Omit<Product, 'id' | 'product_code'>): Observable<Product> {
-    // Get all products to determine the next product_code
     return from(this.dbService.getAll<Product>('products')).pipe(
       switchMap((products) => {
         const maxProductCode = products.length > 0
@@ -78,17 +78,14 @@ export class ProductService {
           ...productData,
           id: tempId,
           product_code: nextProductCode,
-          cost_price: productData.cost_price || 0,
-          stock: productData.stock || 0,
-          is_active: productData.is_active ?? true,
-          description: productData.description || '',
-          unit_price: productData.unit_price || 0,
-          category: productData.category || '',
-          name: productData.name || '',
-          date_added: new Date(),
-          date_modified: new Date(),
-          user_added: productData.user_added || 'system',
-          user_modified: productData.user_modified || 'system'
+          name: productData.name,
+          category: productData.category,
+          description: productData.description,
+          unit_price: productData.unit_price,
+          cost_price: productData.cost_price,
+          stock: productData.stock,
+          is_Stock_enable: productData.is_Stock_enable,
+          is_active: productData.is_active
         };
         return from(this.dbService.add<Product>('products', tempProduct)).pipe(
           tap(() => {

@@ -5,6 +5,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
 import { Customer } from '../../../model/customer.model';
 
 @Component({
@@ -17,6 +19,8 @@ import { Customer } from '../../../model/customer.model';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatCheckboxModule,
+    MatSelectModule,
   ],
   templateUrl: './customer-form.component.html',
   styleUrl: './customer-form.component.scss',
@@ -29,10 +33,15 @@ export class CustomerFormComponent {
     public dialogRef: MatDialogRef<CustomerFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { customer: Customer }
   ) {
+    const c = data.customer;
     this.customerForm = this.fb.group({
-      name: [data.customer?.name || '', Validators.required],
-      email: [data.customer?.email || '', [Validators.required, Validators.email]],
-      phone: [data.customer?.phone || ''],
+      name: [c?.name || '', Validators.required],
+      phone_number: [c?.phone_number || '', Validators.required],
+      place: [c?.place || ''],
+      type: [c?.type || 'regular'],
+      display_order: [c?.display_order ?? 0, [Validators.min(0)]],
+      is_active: [c?.is_active ?? true],
+      date_added: [c?.date_added || new Date().toISOString()],
     });
   }
 

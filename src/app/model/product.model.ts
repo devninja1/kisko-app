@@ -1,15 +1,12 @@
 export interface Product {
   id: number;
-  product_code: number; // Unique, auto-incremented code
+  product_code: number;
   name: string;
+  category: string;
+  description: string;
   unit_price: number;
   cost_price: number;
   stock: number;
-  category: string;
-  description?: string;
-  is_active?: boolean;
-  date_added: Date;
-  date_modified: Date;
-  user_added: string;
-  user_modified: string;
+  is_Stock_enable: boolean;
+  is_active: boolean;
 }

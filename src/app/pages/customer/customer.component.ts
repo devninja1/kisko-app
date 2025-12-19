@@ -31,7 +31,7 @@ import { ConfirmationDialogComponent } from '../../shared/components/confirmatio
   styleUrl: './customer.component.scss'
 })
 export class CustomerComponent implements OnInit, AfterViewInit {
-  displayedColumns: string[] = ['name', 'email', 'phone', 'actions'];
+  displayedColumns: string[] = ['customerId', 'name', 'phone_number', 'place', 'type', 'display_order', 'is_active', 'date_added', 'actions'];
   dataSource: MatTableDataSource<Customer>;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -42,6 +42,22 @@ export class CustomerComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.dataSource.filterPredicate = (data: Customer, filter: string) => {
+      const term = filter.trim().toLowerCase();
+      const haystack = [
+        data.name,
+        data.phone_number,
+        data.place,
+        data.type,
+        data.display_order?.toString(),
+        data.customerId?.toString(),
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+      return haystack.includes(term);
+    };
+
     this.loadCustomers();
   }
 
@@ -69,10 +85,15 @@ export class CustomerComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
+        const payload = {
+          ...customer,
+          ...result,
+          date_added: result.date_added || customer?.date_added || new Date().toISOString(),
+        } as Customer;
         if (customer) {
-          this.customerService.updateCustomer({ ...customer, ...result }).subscribe(() => this.loadCustomers());
+          this.customerService.updateCustomer(payload).subscribe(() => this.loadCustomers());
         } else {
-          this.customerService.addCustomer(result).subscribe(() => this.loadCustomers());
+          this.customerService.addCustomer(payload as Omit<Customer, 'id'>).subscribe(() => this.loadCustomers());
         }
       }
     });
