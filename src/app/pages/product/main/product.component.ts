@@ -88,7 +88,7 @@ export class ProductComponent implements OnInit, AfterViewInit {
     // The getProducts() returns a BehaviorSubject, so we can subscribe to it.
     // The table will update automatically whenever the service emits new data.
     this.productService.getProducts().subscribe(products => {
-      console.log('Received products page 1:', products);
+      //console.log('Received products page 1:', products);
       this.dataSource.data = products;
       this.uniqueCategories = [...new Set(products.map(p => p.category))].sort();
       // Re-apply the filter in case the data changed

@@ -65,11 +65,11 @@ export class SalesService {
       tap(() => {
         const currentSales = this.sales$.getValue();
         this.sales$.next([...currentSales, tempSale]);
-        this.syncService.addToQueue({
-          url: this.apiUrl,
-          method: 'POST',
-          payload: { ...saleData, tempId }
-        });
+        // this.syncService.addToQueue({
+        //   url: this.apiUrl,
+        //   method: 'POST',
+        //   payload: { ...saleData, tempId }
+        // });
       }),
       // Execute all stock updates
       switchMap(() => forkJoin(stockUpdateObservables).pipe(switchMap(() => of(tempSale))))

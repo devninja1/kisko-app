@@ -89,11 +89,11 @@ export class SupplierService {
       tap(() => {
         const currentSuppliers = this.suppliers$.getValue();
         this.suppliers$.next([...currentSuppliers, tempSupplier]);
-        this.syncService.addToQueue({
-          url: this.apiUrl,
-          method: 'POST',
-          payload: { ...supplierData, tempId }
-        });
+        // this.syncService.addToQueue({
+        //   url: this.apiUrl,
+        //   method: 'POST',
+        //   payload: { ...supplierData, tempId }
+        // });
       }),
       map(() => tempSupplier), // Return the temporary supplier
       catchError(err => {
@@ -104,11 +104,11 @@ export class SupplierService {
   }
 
   updateSupplier(updatedSupplier: Supplier): Observable<Supplier> {
-    this.syncService.addToQueue({
-      url: `${this.apiUrl}/${updatedSupplier.id}`,
-      method: 'PUT',
-      payload: updatedSupplier
-    });
+    // this.syncService.addToQueue({
+    //   url: `${this.apiUrl}/${updatedSupplier.id}`,
+    //   method: 'PUT',
+    //   payload: updatedSupplier
+    // });
     return from(this.dbService.update<Supplier>('suppliers', updatedSupplier)).pipe(
       tap(() => {
         const currentSuppliers = this.suppliers$.getValue();

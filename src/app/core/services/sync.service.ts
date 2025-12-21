@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NgxIndexedDBService } from 'ngx-indexed-db';
-import { fromEvent, merge, of, Subject, BehaviorSubject, Observable, tap, switchMap } from 'rxjs';
+import { fromEvent, merge, of, Subject, BehaviorSubject, Observable, tap, switchMap, map } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { mapTo, takeUntil, distinctUntilChanged } from 'rxjs/operators';
-import { Product } from '../../model/product.model';
-import { Customer } from '../../model/customer.model';
+import { takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
 export interface QueuedRequest {
   id?: number;
@@ -40,8 +38,8 @@ export class SyncService {
   private init(): void {
     merge(
       of(navigator.onLine),
-      fromEvent(window, 'online').pipe(mapTo(true)),
-      fromEvent(window, 'offline').pipe(mapTo(false))
+      fromEvent(window, 'online').pipe(map(() => true)),
+      fromEvent(window, 'offline').pipe(map(() => false))
     ).pipe(distinctUntilChanged(), takeUntil(this.destroy$)).subscribe(isOnline => {
       this.online$.next(isOnline);
       if (isOnline) {
@@ -61,7 +59,10 @@ export class SyncService {
   }
 
   getPendingRequestCount(): Observable<number> {
-    return this.dbService.count('sync-queue');
+    return this.pendingRequests$.pipe(
+      map(reqs => reqs.length),
+      distinctUntilChanged()
+    );
   }
 
   getPendingRequests(): Observable<QueuedRequest[]> {
@@ -128,7 +129,9 @@ export class SyncService {
               // For DELETE, a 404 means it's already gone, which is a success state for our purpose.
 
               // 3. Clean up the failed/irrelevant request from the queue.
-              this.dbService.delete('sync-queue', req.id!).subscribe();
+              this.dbService.delete('sync-queue', req.id!).subscribe(() => {
+                this.refreshQueues();
+              });
             }
             // For any other error, move it to the failed queue
             else {

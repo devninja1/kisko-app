@@ -31,9 +31,9 @@ export class ProductFormComponent {
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<ProductFormComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { product?: Product }
+    @Inject(MAT_DIALOG_DATA) public productDialogData: { product?: Product }
   ) {
-    const product = data?.product;
+    const product = productDialogData?.product;
     this.productForm = this.fb.group({
       name: [product?.name || '', Validators.required],
       category: [product?.category || '', Validators.required],
@@ -41,7 +41,7 @@ export class ProductFormComponent {
       cost_price: [product?.cost_price || 0, [Validators.required, Validators.min(0)]],
       unit_price: [product?.unit_price || 0, [Validators.required, Validators.min(0)]],
       stock: [product?.stock || 0, [Validators.required, Validators.min(0)]],
-      is_Stock_enable: [product?.is_Stock_enable ?? true],
+      is_Stock_enable: [product?.is_Stock_enable ?? false],
       is_active: [product?.is_active ?? true],
     });
   }

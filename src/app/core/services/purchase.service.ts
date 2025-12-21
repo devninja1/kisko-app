@@ -63,9 +63,9 @@ export class PurchaseService {
       tap(() => {
         const currentPurchases = this.purchases$.getValue();
         this.purchases$.next([...currentPurchases, purchaseToSave]);
-        this.syncService.addToQueue({
-          url: this.apiUrl, method: 'POST', payload: { ...purchaseData, tempId }
-        });
+        // this.syncService.addToQueue({
+        //   url: this.apiUrl, method: 'POST', payload: { ...purchaseData, tempId }
+        // });
       }),
       // Execute all stock updates
       switchMap(() => forkJoin(stockUpdateObservables).pipe(map(() => purchaseToSave)))

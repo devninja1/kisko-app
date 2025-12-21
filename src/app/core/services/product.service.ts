@@ -14,11 +14,11 @@ export class ProductService {
   private isOnline = navigator.onLine;
   private products$ = new BehaviorSubject<Product[]>([]);
   private defaultProducts: Product[] = [
-    { id: 1, product_code: 1001, name: 'Slice', category: 'Bread', description: 'A slice of bread', unit_price: 27, cost_price: 26, stock: 10, is_Stock_enable: true, is_active: true },
-    { id: 2, product_code: 1002, name: 'HB', category: 'Bread', description: ' hybride quater', unit_price: 86, cost_price: 80, stock: 50, is_Stock_enable: true, is_active: true },
-    { id: 3, product_code: 1003, name: 'Half', category: 'Bread', description: 'Half loaf of bread', unit_price: 27, cost_price: 26, stock: 25, is_Stock_enable: true, is_active: false },
-    { id: 4, product_code: 1004, name: 'Rolla', category: 'Bread', description: 'rolla bread', unit_price: 27, cost_price: 26, stock: 15, is_Stock_enable: true, is_active: true },
-    { id: 5, product_code: 1005, name: 'CD', category: 'Bread', description: 'CD bread', unit_price: 80, cost_price: 78, stock: 30, is_Stock_enable: true, is_active: true },
+    // { id: 1, product_code: 1001, name: 'Slice', category: 'Bread', description: 'A slice of bread', unit_price: 27, cost_price: 26, stock: 10, is_Stock_enable: true, is_active: true },
+    // { id: 2, product_code: 1002, name: 'HB', category: 'Bread', description: ' hybride quater', unit_price: 86, cost_price: 80, stock: 50, is_Stock_enable: true, is_active: true },
+    // { id: 3, product_code: 1003, name: 'Half', category: 'Bread', description: 'Half loaf of bread', unit_price: 27, cost_price: 26, stock: 25, is_Stock_enable: true, is_active: false },
+    // { id: 4, product_code: 1004, name: 'Rolla', category: 'Bread', description: 'rolla bread', unit_price: 27, cost_price: 26, stock: 15, is_Stock_enable: true, is_active: true },
+    // { id: 5, product_code: 1005, name: 'CD', category: 'Bread', description: 'CD bread', unit_price: 80, cost_price: 78, stock: 30, is_Stock_enable: true, is_active: true },
   ];
 
   constructor(
@@ -34,17 +34,18 @@ export class ProductService {
   private loadInitialData() {
     this.dbService.count('products').subscribe(count => {
       if (count === 0) {
-        // DB is empty, populate with default data first.
+        //// DB is empty, populate with default data first.
         this.dbService.bulkAdd<Product>('products', this.defaultProducts).subscribe(() => {
           this.products$.next(this.defaultProducts);
           if (this.isOnline) this.syncWithApi();
         });
       } else {
-        // DB has data, load it and then sync if online.
-        this.dbService.getAll<Product>('products').subscribe(prods => {
-          this.products$.next(prods);
-          if (this.isOnline) this.syncWithApi();
-          });
+      ////DB has data, load it and then sync if online.
+      this.dbService.getAll<Product>('products').subscribe(prods => {
+        console.log('Loaded products from IndexedDB:', prods);
+        this.products$.next(prods);
+        if (this.isOnline) this.syncWithApi();
+      });
       }
     });
   }
@@ -69,9 +70,7 @@ export class ProductService {
   addProduct(productData: Omit<Product, 'id' | 'product_code'>): Observable<Product> {
     return from(this.dbService.getAll<Product>('products')).pipe(
       switchMap((products) => {
-        const maxProductCode = products.length > 0
-          ? Math.max(...products.map(p => p.product_code || 1000))
-          : 1000;
+        const maxProductCode = products.reduce((max, p) => Math.max(max, p.product_code || 1000), 1000);
         const nextProductCode = maxProductCode + 1;
         const tempId = -Date.now();
         const tempProduct: Product = {
