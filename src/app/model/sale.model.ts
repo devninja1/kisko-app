@@ -5,6 +5,7 @@ export interface Sale {
   id: number;
   customer: Customer | null;
   customerName: string;
+  group?: string;
   items: SalesItem[];
   grandTotal: number;
   date: Date;

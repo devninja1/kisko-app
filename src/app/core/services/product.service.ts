@@ -84,7 +84,8 @@ export class ProductService {
           cost_price: productData.cost_price,
           stock: productData.stock,
           is_Stock_enable: productData.is_Stock_enable,
-          is_active: productData.is_active
+          is_active: productData.is_active,
+          group: productData.group
         };
         return from(this.dbService.add<Product>('products', tempProduct)).pipe(
           tap(() => {
@@ -126,6 +127,10 @@ export class ProductService {
     return from(this.dbService.getByID<Product>('products', productId)).pipe(
       concatMap((product) => {
         if (product) {
+          if (!product.is_Stock_enable) {
+            return of(product);
+          }
+
           const updatedProduct = { ...product, stock: product.stock + quantityChange };
           this.syncService.addToQueue({
             url: `${this.apiUrl}/${productId}/stock`, method: 'PATCH', payload: { change: quantityChange }
@@ -135,7 +140,7 @@ export class ProductService {
         return of(undefined);
       }),
       tap((updatedProduct) => {
-        if (updatedProduct) {
+        if (updatedProduct && updatedProduct.is_Stock_enable) {
           const currentProducts = this.products$.getValue();
           const index = currentProducts.findIndex(p => p.id === updatedProduct.id);
           if (index !== -1) {

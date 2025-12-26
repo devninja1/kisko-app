@@ -2,6 +2,7 @@ export interface Product {
   id: number;
   product_code: number;
   name: string;
+  group?: string;
   category: string;
   description: string;
   unit_price: number;
