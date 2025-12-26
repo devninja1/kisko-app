@@ -21,12 +21,12 @@ export class SalesListComponent {
     if (!this.salesList || this.salesList.length === 0) {
       return 0;
     }
-    return this.salesList.reduce((accumulator, item) => accumulator + item.total, 0);
+    return this.salesList.reduce((accumulator, item) => accumulator + item.subtotal, 0);
   }
 
   trackByProduct(index: number, item: SalesItem): string {
     // Create a unique identifier for each row for better *ngFor performance
-    return `${item.product.name}-${index}`;
+    return `${item.product_name}-${index}`;
   }
 
   deleteItem(index: number): void {

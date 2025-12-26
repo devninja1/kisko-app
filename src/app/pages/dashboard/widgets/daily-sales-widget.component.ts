@@ -38,13 +38,13 @@ export class DailySalesWidgetComponent implements OnInit {
     const productSalesMap = new Map<string, { totalQuantity: number; totalAmount: number }>();
 
     sales
-      .filter(sale => new Date(sale.date).setHours(0, 0, 0, 0) === today.getTime())
-      .flatMap(sale => sale.items)
+      .filter(sale => new Date(sale.order_date).setHours(0, 0, 0, 0) === today.getTime())
+      .flatMap(sale => sale.order_items)
       .forEach(item => {
-        const existing = productSalesMap.get(item.product.name) ?? { totalQuantity: 0, totalAmount: 0 };
+        const existing = productSalesMap.get(item.product_name) ?? { totalQuantity: 0, totalAmount: 0 };
         existing.totalQuantity += item.quantity;
-        existing.totalAmount += item.total;
-        productSalesMap.set(item.product.name, existing);
+        existing.totalAmount += item.subtotal;
+        productSalesMap.set(item.product_name, existing);
       });
 
     this.dailyProductSales = Array.from(productSalesMap.entries()).map(([productName, data]) => ({

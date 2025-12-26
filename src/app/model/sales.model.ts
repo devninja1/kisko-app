@@ -1,7 +1,11 @@
-import { Product } from "./product.model";
-
 export interface SalesItem {
-  product: Product;
+  /** Product id */
+  id: number;
+  product_code: number;
+  product_name: string;
+  unit_price: number;
   quantity: number;
-  total: number;
+  discount: number;
+  subtotal: number;
+  updated_date: Date;
 }

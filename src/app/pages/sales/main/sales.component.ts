@@ -78,9 +78,9 @@ export class SalesComponent implements OnInit {
 
   onItemAdded(newItem: SalesItem) {
     // Decrease stock from the master product list
-    this.productService.updateStock(newItem.product.id, -newItem.quantity).subscribe();
+    this.productService.updateStock(newItem.id, -newItem.quantity).subscribe();
     const existingItemIndex = this.salesList.findIndex(
-      (saleItem) => saleItem.product.name === newItem.product.name
+      (saleItem) => saleItem.id === newItem.id
     );
 
     if(existingItemIndex > -1) {
@@ -88,16 +88,18 @@ export class SalesComponent implements OnInit {
       const updatedSalesList = [...this.salesList];
       const existingItem = updatedSalesList[existingItemIndex];
 
-      // Update quantity, rate, and total
+      // Update quantity, rate, and subtotal
       existingItem.quantity += newItem.quantity;
-      existingItem.product.unit_price = newItem.product.unit_price; // Use the latest rate
-      existingItem.total = existingItem.product.unit_price * existingItem.quantity;
+      existingItem.unit_price = newItem.unit_price; // Use the latest rate
+      existingItem.discount = newItem.discount;
+      existingItem.subtotal = Math.max(0, (existingItem.unit_price * existingItem.quantity) - (existingItem.discount || 0));
+      existingItem.updated_date = new Date();
 
       this.salesList = updatedSalesList;
     } else {
       // Product is new, add it to the list
       this.salesList = [...this.salesList, newItem];
-      this.addedProductNames.add(newItem.product.name);
+      this.addedProductNames.add(newItem.product_name);
     }
   }
 
@@ -134,16 +136,16 @@ export class SalesComponent implements OnInit {
   onItemDeleted(index: number) {
     const deletedItem = this.salesList[index];
     if (deletedItem) {
-      this.productService.updateStock(deletedItem.product.id, deletedItem.quantity).subscribe();
+      this.productService.updateStock(deletedItem.id, deletedItem.quantity).subscribe();
 
-      this.addedProductNames.delete(deletedItem.product.name);
+      this.addedProductNames.delete(deletedItem.product_name);
       // Create a new array to ensure change detection is triggered
       this.salesList = this.salesList.filter((_, i: number) => i !== index);
     }
   }
 
   get grandTotal(): number {
-    return this.salesList.reduce((acc, item) => acc + item.total, 0);
+    return this.salesList.reduce((acc, item) => acc + item.subtotal, 0);
   }
 
   saveSale(): void {
@@ -162,11 +164,14 @@ export class SalesComponent implements OnInit {
 
     this.salesService
       .saveSale({
-        customer: this.selectedCustomer,
-        customerName: this.selectedCustomer.name,
-        items: this.salesList,
-        grandTotal: this.grandTotal,
-        date: new Date(),
+        customer_id: this.selectedCustomer.id,
+        customer_name: this.selectedCustomer.name,
+        status: 'pending',
+        discount: this.salesList.reduce((acc, item) => acc + (item.discount || 0), 0),
+        is_review: false,
+        order_items: this.salesList,
+        total_amount: this.salesList.reduce((acc, item) => acc + (item.subtotal || 0), 0),
+        order_date: new Date(),
       })
       .subscribe(() => {
         this.snackBar.open('Sale saved successfully!', 'Close', {

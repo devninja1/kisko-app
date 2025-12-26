@@ -89,13 +89,18 @@ export class SalesEntryComponent implements OnInit {
       return;
     }
 
+    const discount = 0;
+    const subtotal = Math.max(0, this.totalAmount - discount);
+
     this.itemAdded.emit({
-      product: {
-        ...this.selectedProduct,
-        unit_price: this.editableRate,
-      },
+      id: this.selectedProduct.id,
+      product_code: this.selectedProduct.product_code,
+      product_name: this.selectedProduct.name,
+      unit_price: this.editableRate,
       quantity: this.quantity,
-      total: this.totalAmount,
+      discount,
+      subtotal,
+      updated_date: new Date(),
     });
 
     this.resetForm();

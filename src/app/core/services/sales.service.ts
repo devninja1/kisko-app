@@ -11,7 +11,7 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class SalesService {
-  private apiUrl = `${environment.apiUrl}/sales`;
+  private apiUrl = `${environment.apiUrl}/SalesOrder`;
   private isOnline = navigator.onLine;
   private sales$ = new BehaviorSubject<Sale[]>([]);
 
@@ -57,19 +57,19 @@ export class SalesService {
     const tempSale: Sale = { ...saleData, id: tempId };
 
     // Create an array of stock update observables
-    const stockUpdateObservables = saleData.items.map(item =>
-      this.productService.updateStock(item.product.id, -item.quantity) // Decrease stock
+    const stockUpdateObservables = saleData.order_items.map(item =>
+      this.productService.updateStock(item.id, -item.quantity) // Decrease stock
     );
 
     return from(this.dbService.add<Sale>('sales', tempSale)).pipe(
       tap(() => {
         const currentSales = this.sales$.getValue();
         this.sales$.next([...currentSales, tempSale]);
-        // this.syncService.addToQueue({
-        //   url: this.apiUrl,
-        //   method: 'POST',
-        //   payload: { ...saleData, tempId }
-        // });
+        this.syncService.addToQueue({
+          url: this.apiUrl,
+          method: 'POST',
+          payload: { ...saleData, tempId }
+        });
       }),
       // Execute all stock updates
       switchMap(() => forkJoin(stockUpdateObservables).pipe(switchMap(() => of(tempSale))))

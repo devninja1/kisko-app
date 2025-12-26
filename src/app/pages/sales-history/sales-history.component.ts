@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe, NgFor } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -19,6 +19,7 @@ import { MatInputModule } from '@angular/material/input';
   standalone: true,
   imports: [
     CommonModule,
+    NgFor,
     MatTableModule,
     MatIconModule,
     MatButtonModule,
@@ -36,7 +37,7 @@ import { MatInputModule } from '@angular/material/input';
 })
 export class SalesHistoryComponent implements OnInit, AfterViewInit {
   dataSource: MatTableDataSource<Sale>;
-  columnsToDisplay = ['expand', 'id', 'customer', 'date', 'grandTotal', 'actions'];
+  columnsToDisplay = ['expand', 'id', 'customer', 'order_date', 'total_amount', 'actions'];
   expandedElement: Sale | null = null;
   private originalData: Sale[] = [];
 
@@ -61,7 +62,7 @@ export class SalesHistoryComponent implements OnInit, AfterViewInit {
       const { start, end } = JSON.parse(filter);
       if (!start || !end) return true;
 
-      const saleDate = new Date(data.date);
+      const saleDate = new Date(data.order_date);
       // Set time to 0 to compare dates only
       saleDate.setHours(0, 0, 0, 0);
       const startDate = new Date(start);
@@ -126,12 +127,12 @@ export class SalesHistoryComponent implements OnInit, AfterViewInit {
     const currencyPipe = new CurrencyPipe('en-US');
     const datePipe = new DatePipe('en-US');
 
-    const itemsHtml = sale.items.map(item => `
+    const itemsHtml = sale.order_items.map(item => `
       <tr>
-        <td>${item.product.name}</td>
+        <td>${item.product_name}</td>
         <td class="text-right">${item.quantity}</td>
-        <td class="text-right">${currencyPipe.transform(item.product.unit_price)}</td>
-        <td class="text-right">${currencyPipe.transform(item.total)}</td>
+        <td class="text-right">${currencyPipe.transform(item.unit_price)}</td>
+        <td class="text-right">${currencyPipe.transform(item.subtotal)}</td>
       </tr>
     `).join('');
 
@@ -160,8 +161,8 @@ export class SalesHistoryComponent implements OnInit, AfterViewInit {
             <div class="header">
               <h2>Kisko App</h2>
               <p>Sale Receipt</p>
-              <p>Date: ${datePipe.transform(sale.date, 'short')}</p>
-              <p>Customer: ${sale.customerName ?? 'N/A'}</p>
+              <p>Date: ${datePipe.transform(sale.order_date, 'short')}</p>
+              <p>Customer: ${sale.customer_name ?? 'N/A'}</p>
             </div>
             <table class="items-table">
               <thead>
@@ -169,7 +170,7 @@ export class SalesHistoryComponent implements OnInit, AfterViewInit {
                   <th>Item</th>
                   <th class="text-right">Qty</th>
                   <th class="text-right">Price</th>
-                  <th class="text-right">Total</th>
+                  <th class="text-right">Subtotal</th>
                 </tr>
               </thead>
               <tbody>${itemsHtml}</tbody>
@@ -177,7 +178,7 @@ export class SalesHistoryComponent implements OnInit, AfterViewInit {
             <div class="totals">
               <div class="total-row grand-total">
                 <span>Grand Total:</span>
-                <span>${currencyPipe.transform(sale.grandTotal)}</span>
+                <span>${currencyPipe.transform(sale.total_amount)}</span>
               </div>
             </div>
             <div class="footer">
@@ -195,6 +196,6 @@ export class SalesHistoryComponent implements OnInit, AfterViewInit {
   }
 
   trackByProduct(index: number, item: SalesItem): number {
-    return item.product.id;
+    return item.id;
   }
 }

@@ -6,15 +6,15 @@
         <span class="col-product">Product</span>
         <span class="col-rate">Rate</span>
         <span class="col-qty">Qty</span>
-        <span class="col-total">Total</span>
+        <span class="col-total">Subtotal</span>
         <span class="col-actions"></span>
       </div>
       @for (item of salesList; track trackByProduct(i, item); let i = $index) {
         <div class="sales-list-item added-item">
-          <span class="col-product">{{ item.product.name }}</span>
-          <span class="col-rate">{{ item.product.unit_price | currency:'INR':'symbol' }}</span>
+          <span class="col-product">{{ item.product_name }}</span>
+          <span class="col-rate">{{ item.unit_price | currency:'INR':'symbol' }}</span>
           <span class="col-qty">{{ item.quantity }}</span>
-          <span class="col-total">{{ item.total | currency:'INR':'symbol' }}</span>
+          <span class="col-total">{{ item.subtotal | currency:'INR':'symbol' }}</span>
           <span class="col-actions">
             <button mat-icon-button color="warn" (click)="deleteItem(i)" aria-label="Delete item">
               <mat-icon>delete</mat-icon>

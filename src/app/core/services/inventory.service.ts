@@ -71,7 +71,7 @@ export class InventoryService {
       const endTimestamp = new Date(endDate.getTime() + 24 * 60 * 60 * 1000).getTime(); // Include full end day
 
       filteredSales = allSales.filter(sale => {
-        const saleTime = new Date(sale.date).getTime();
+        const saleTime = new Date(sale.order_date).getTime();
         return saleTime >= startTimestamp && saleTime <= endTimestamp;
       });
 
@@ -83,16 +83,33 @@ export class InventoryService {
 
     // Process sales for outflow
     for (const sale of filteredSales) {
-      for (const item of sale.items) {
+      for (const item of sale.order_items) {
+        const resolvedProduct =
+          allProducts.find(p => p.id === item.id) ??
+          allProducts.find(p => p.product_code === item.product_code) ??
+          ({
+            id: item.id,
+            product_code: item.product_code,
+            name: item.product_name,
+            group: undefined,
+            category: 'Unknown',
+            description: '',
+            unit_price: item.unit_price,
+            cost_price: 0,
+            stock: 0,
+            is_Stock_enable: false,
+            is_active: false,
+          } as Product);
+
         outflowItems.push({
-          product: item.product,
+          product: resolvedProduct,
           quantity: item.quantity,
-          outflow_date: sale.date,
+          outflow_date: sale.order_date,
           reason: 'Sale'
         });
-        const metrics = productMetricsMap.get(item.product.id) || { sold: 0, added: 0, adjusted: 0 };
+        const metrics = productMetricsMap.get(resolvedProduct.id) || { sold: 0, added: 0, adjusted: 0 };
         metrics.sold += item.quantity;
-        productMetricsMap.set(item.product.id, metrics);
+        productMetricsMap.set(resolvedProduct.id, metrics);
       }
     }
 
